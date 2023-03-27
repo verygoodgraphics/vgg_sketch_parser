@@ -1,4 +1,28 @@
-﻿#include "./abstract_layer.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./abstract_layer.h"
 #include "src/sketch_object/check.hpp"
 #include "src/sketch_object/attrs/rect_change.h"
 #include "src/sketch_object/attrs/style_change.h"
@@ -19,101 +43,95 @@
 
 void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
-    try
+    get_json_value<string>(sketch, "do_objectID", vgg["id"], "fail to get object id");
+    this->id_ = vgg["id"].get<string>();
+    assert(!this->id_.empty());
+
+    this->boolean_operation_ = get_json_value(sketch, "booleanOperation", -1);
+    switch (this->boolean_operation_)
     {
-        this->id_ = sketch.at("do_objectID").get<string>();
-        vgg["id"] = this->id_;
-        assert(!this->id_.empty());
-
-        this->boolean_operation_ = sketch.at("booleanOperation").get<int>();
-        switch (this->boolean_operation_)
+        case -1:
         {
-            case -1:
-            {
-                this->boolean_operation_ = 4;
-                break;
-            }
-            
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            {
-                ++this->boolean_operation_;
-                break;
-            }
-
-            default:
-            {
-                throw sketch_exception("invalid boolean operator");
-            }
+            this->boolean_operation_ = 4;
+            break;
         }
 
-        //bounds frame matrix
+        case 0:
+        case 1:
+        case 2:
+        case 3:
         {
-            rect_change::change(sketch.at("frame"), vgg["bounds"]);
-            
-            double matrix[6] = {};
-            rect_change::matrix_calc(matrix, sketch.at("isFlippedHorizontal").get<bool>(),
-                sketch.at("isFlippedVertical").get<bool>(), sketch.at("rotation").get<double>(),
-                vgg["bounds"].at("x").get<double>(), vgg["bounds"].at("y").get<double>(),
-                vgg["bounds"].at("width").get<double>(), vgg["bounds"].at("height").get<double>());
-            rect_change::form_matrix(matrix, vgg["matrix"]);
-
-            rect_change::calc_frame(matrix, vgg["bounds"], vgg["frame"]);
-
-            //备注: bounds的起点固定为(0, 0)
-            vgg["bounds"].at("x") = 0.0;
-            vgg["bounds"].at("y") = 0.0;
+            ++this->boolean_operation_;
+            break;
         }
 
-        vgg["isLocked"] = sketch.at("isLocked").get<bool>();
-        vgg["visible"] = sketch.at("isVisible").get<bool>();
-        vgg["name"] = sketch.at("name").get<string>();
-
-        if (sketch.find("style") == sketch.end())
+        default:
         {
-            style_change::get_default(vgg["style"]);
-            context_settings_change::get_default(vgg["contextSettings"]);
+            throw sketch_exception("invalid boolean operator");
         }
-        else 
-        {
-            style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"]);
-        }
-
-        /*
-        hasClippingMask
-            true: 自身是蒙版
-            false: 自身不是蒙版
-        clippingMaskMode 仅在 hasClippingMask 为 true 时有效
-            0: outline mask
-            1: alpha mask
-        */
-        if (sketch.at("hasClippingMask").get<bool>())
-        {
-            this->mask_type_ = sketch.at("clippingMaskMode").get<int>() + 1;
-        }
-        else 
-        {
-            this->mask_type_ = 0;
-        }
-        this->break_mask_chain_ = sketch.at("shouldBreakMaskChain").get<bool>();
-
-        //这两个属性由子类自行设置
-        vgg["alphaMaskBy"] = nlohmann::json::array();
-        vgg["outlineMaskBy"] = nlohmann::json::array();
-
-        vgg["isMask"] = static_cast<bool>(this->mask_type_);
     }
-    catch (sketch_exception &e)
+
+    //bounds frame matrix
     {
-        throw e;
+        rect_change::change(*get_json_item(sketch, "frame", "fail to get obj frame"), vgg["bounds"]);
+
+        double matrix[6] = {};
+        rect_change::matrix_calc(matrix,
+            get_json_value(sketch, "isFlippedHorizontal", false),
+            get_json_value(sketch, "isFlippedVertical", false),
+            get_json_value(sketch, "rotation", 0.0),
+            vgg["bounds"].at("x").get<double>(), 
+            vgg["bounds"].at("y").get<double>(),
+            vgg["bounds"].at("width").get<double>(), 
+            vgg["bounds"].at("height").get<double>());
+        rect_change::form_matrix(matrix, vgg["matrix"]);
+
+        rect_change::calc_frame(matrix, vgg["bounds"], vgg["frame"]);
+
+        // 备注: bounds的起点固定为(0, 0)
+        vgg["bounds"].at("x") = 0.0;
+        vgg["bounds"].at("y") = 0.0;
     }
-    catch (...)
+
+    vgg["isLocked"] = get_json_value(sketch, "isLocked", false);
+    vgg["visible"] = get_json_value(sketch, "isVisible", true);
+    vgg["name"] = get_json_value(sketch, "name", string("empty-name"));
+
+    if (sketch.find("style") == sketch.end())
     {
-        assert(false);
-        throw sketch_exception("fail to change abstract layer");
+        style_change::get_default(vgg["style"]);
+        context_settings_change::get_default(vgg["contextSettings"]);
     }
+    else 
+    {
+        style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"]);
+    }
+
+    /*
+    hasClippingMask
+        true: 自身是蒙版
+        false: 自身不是蒙版
+    clippingMaskMode 仅在 hasClippingMask 为 true 时有效
+        0: outline mask
+        1: alpha mask
+    */
+    
+    if (get_json_value(sketch, "hasClippingMask", false))
+    {
+        get_json_value<int, int>(sketch, "clippingMaskMode", this->mask_type_, "fail to get obj clipping mask mode");
+        ++this->mask_type_;
+    }
+    else 
+    {
+        this->mask_type_ = 0;
+    }
+    this->break_mask_chain_ = get_json_value(sketch, "shouldBreakMaskChain", false);
+
+    //这两个属性由子类自行设置
+    vgg["alphaMaskBy"] = nlohmann::json::array();
+    vgg["outlineMaskBy"] = nlohmann::json::array();
+
+    vgg["isMask"] = static_cast<bool>(this->mask_type_);
 
     /*
     未处理的项:
