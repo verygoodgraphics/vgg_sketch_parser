@@ -1,4 +1,28 @@
-﻿#include "./abstract_shape.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./abstract_shape.h"
 #include "src/sketch_object/attrs/rect_change.h"
 #include "src/sketch_object/utils/point_string_change.h"
 #include "src/sketch_object/check.hpp"
@@ -7,45 +31,37 @@ void abstract_shape::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     assert(vgg.empty());
     abstract_layer::change(sketch, vgg);
+    vgg["class"] = "path";
 
+    nlohmann::json contour;
+    contour["class"] = "contour";
+    contour["closed"] = get_json_value(sketch, "isClosed", false);
+    abstract_shape::curve_point_change(
+        *get_json_item(sketch, "points", "fail to get shape points"),
+        *get_json_item(sketch, "frame", "fail to get shape frame"),
+        contour["points"]);
+
+    nlohmann::json sub_shape;
+    sub_shape["class"] = string("subshape");
+    sub_shape["subGeometry"] = std::move(contour);
+    sub_shape["booleanOperation"] = this->boolean_operation_;
+
+    nlohmann::json shape;
+    shape["class"] = string("shape");
+    shape["subshapes"].emplace_back(std::move(sub_shape));
+    
     try 
     {
-        vgg["class"] = "path";
-
-        nlohmann::json contour;
-        contour["class"] = "contour";
-        contour["closed"] = sketch.at("isClosed").get<bool>();
-        abstract_shape::curve_point_change(sketch.at("points"), sketch.at("frame"), contour["points"]);
-
-        nlohmann::json sub_shape;
-        sub_shape["class"] = string("subshape");
-        sub_shape["subGeometry"] = std::move(contour);
-        sub_shape["booleanOperation"] = this->boolean_operation_;
-
-        nlohmann::json shape;
-        shape["class"] = string("shape");
-        shape["subshapes"].emplace_back(std::move(sub_shape));
-        
-        try 
-        {
-            shape["windingRule"] = sketch.at("style").at("windingRule");
-        }
-        catch(...)
-        {
-            shape["windingRule"] = 1;
-        }
-        range_check(shape["windingRule"].get<int>(), 0, 1, "invalid winding rule");
-
-        vgg["shape"] = std::move(shape);
-    }
-    catch(sketch_exception &e)
-    {
-        throw e;
+        shape["windingRule"] = sketch.at("style").at("windingRule");
     }
     catch(...)
     {
-        throw sketch_exception("abstract shape analyze fail");
+        shape["windingRule"] = 1;
     }
+    range_check(shape["windingRule"].get<int>(), 0, 1, "invalid winding rule");
+
+    vgg["shape"] = std::move(shape);
+ 
 
     /*
     sketch中未处理的属性包括: 
@@ -84,8 +100,10 @@ void abstract_shape::curve_point_change(const nlohmann::json &sketch_points,
         //备注: 在旋转矩阵里已经考虑了移动, 所以 bounds 的 x y 固定为0, 所以此处不用 frame 的 x y, 而是(0, 0)
         const double x = 0;
         const double y = 0;
-        const double height = sketch_frame.at("height").get<double>();
-        const double width = sketch_frame.at("width").get<double>();
+        double width = 0;
+        double height = 0;
+        get_json_value<double, double>(sketch_frame, "height", height, "fail to get frame height");
+        get_json_value<double, double>(sketch_frame, "width", width, "fail to get frame width");
 
         nlohmann::json point;
         nlohmann::json tem;
@@ -95,7 +113,7 @@ void abstract_shape::curve_point_change(const nlohmann::json &sketch_points,
             assert(item.at("_class").get<string>() == "curvePoint");
 
             point["class"] = string("pointAttr");
-            point["radius"] = item.at("cornerRadius").get<double>();
+            point["radius"] = get_json_value(item, "cornerRadius", 0.0);
 
             auto it = item.find("cornerStyle");
             if (it != item.end())
@@ -104,19 +122,19 @@ void abstract_shape::curve_point_change(const nlohmann::json &sketch_points,
                 range_check(point["cornerStyle"].get<int>(), 0, 3, "invalid corner style");
             }
 
-            if (item.at("hasCurveFrom").get<bool>())
+            if (get_json_item(item, "hasCurveFrom", "fail to get curve point attr: hasCurveFrom")->get<bool>())
             {
-                add_point(x, y, width, height, item.at("curveFrom"), tem);
+                add_point(x, y, width, height, *get_json_item(item, "curveFrom", "fail to get curve point attr: curveFrom"), tem);
                 point["curveFrom"] = std::move(tem);
             }
 
-            if (item.at("hasCurveTo").get<bool>())
+            if (get_json_item(item, "hasCurveTo", "fail to get curve point attr: hasCurveTo")->get<bool>())
             {
-                add_point(x, y, width, height, item.at("curveTo"), tem);
+                add_point(x, y, width, height, *get_json_item(item, "curveTo", "fail to get curve point attr: curveTo"), tem);
                 point["curveTo"] = std::move(tem);
             }
 
-            add_point(x, y, width, height, item.at("point"), tem);
+            add_point(x, y, width, height, *get_json_item(item, "point", "fail to get curve point attr: point"), tem);
             point["point"] = std::move(tem);
 
             vgg.emplace_back(std::move(point));
