@@ -47,7 +47,7 @@ void abstract_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     for (auto &item : *layers)
     {
         string name;
-        get_json_value<string, string>(sketch, "_class", name, "fail to get obj _class");
+        get_json_value<string, string>(sketch, "_class", name, "fail to get group child _class");
 
         auto it = child_.find(name);
         if (it != child_.end())
