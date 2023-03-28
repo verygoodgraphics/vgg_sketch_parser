@@ -1,4 +1,28 @@
-﻿#ifndef bd_sketch_border_change
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#ifndef bd_sketch_border_change
 #define bd_sketch_border_change
 #include "src/basic/define.h"
 #include "nlohmann/json.hpp"
@@ -32,7 +56,7 @@ public:
      * 
      * @return vgg-format fill type
      * 
-     * @exception sketch_exception
+     * @note 当 fill_type 不在预期内时, 固定返回 0 表示使用 color
     */
     static int fill_type_change(int sketch_fill_type);
 };

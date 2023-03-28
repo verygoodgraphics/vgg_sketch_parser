@@ -37,43 +37,53 @@ void shape_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     abstract_layer::change(sketch, vgg);
     assert(sketch.at("_class").get<string>() == "shapeGroup");
 
-    vgg["class"] = string("path");
-
-    auto &shape = vgg["shape"];
-    shape["class"] = string("shape");
-    get_json_value<int>(sketch, "windingRule", shape["windingRule"], "fail to get shape group winding rule");
-    range_check(shape["windingRule"].get<int>(), 0, 1, "invalid winding rule");
-
-    auto layers = get_json_item(sketch, "layers", "fail to get shape group layers");
-    for (auto &item : *layers)
+    try 
     {
-        string name;
-        get_json_value<string>(item, "_class", name, "fail to get shape_group child attr: _class");
+        vgg["class"] = string("path");
 
-        auto it = child_.find(name);
-        if (it != child_.end())
+        auto &shape = vgg["shape"];
+        shape["class"] = string("shape");
+        shape["windingRule"] = sketch.at("windingRule");
+        range_check(shape["windingRule"].get<int>(), 0, 1, "invalid winding rule");
+
+        auto &layers = sketch.at("layers");
+        for (auto &item : layers)
         {
-            nlohmann::json out;
-            it->second->change(item, out);
-            assert(!out.empty());
+            string name = item.at("_class").get<string>();
+            auto it = child_.find(name);
+            
+            if (it != child_.end())
+            {
+                nlohmann::json out;
+                it->second->change(item, out);
+                assert(!out.empty());
 
-            nlohmann::json sub_shape;
-            sub_shape["class"] = string("subshape");
-            sub_shape["subGeometry"] = std::move(out);
-            sub_shape["booleanOperation"] = it->second->boolean_operation_;
+                nlohmann::json sub_shape;
+                sub_shape["class"] = string("subshape");
+                sub_shape["subGeometry"] = std::move(out);
+                sub_shape["booleanOperation"] = it->second->boolean_operation_;
 
-            shape["subshapes"].emplace_back(std::move(sub_shape));
+                shape["subshapes"].emplace_back(std::move(sub_shape));
+            }
+            else 
+            {
+                assert(name == "slice" || name == "MSImmutableHotspotLayer");
+            }
         }
-        else 
-        {
-            assert(name == "slice" || name == "MSImmutableHotspotLayer");
-        }
+
+        /*
+        sketch中未处理的属性包括:
+        hasClickThrough
+        groupLayout
+        */
     }
-
-    /*
-    sketch中未处理的属性包括:
-    hasClickThrough
-    groupLayout
-    */
-
+    catch(sketch_exception &e)
+    {
+        throw e;
+    }
+    catch(...)
+    {
+        assert(false);
+        throw sketch_exception("fail to analyze shape group");
+    }
 }

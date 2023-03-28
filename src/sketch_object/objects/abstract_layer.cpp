@@ -43,110 +43,120 @@ SOFTWARE.
 
 void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
-    get_json_value<string>(sketch, "do_objectID", vgg["id"], "fail to get object id");
-    this->id_ = vgg["id"].get<string>();
-    assert(!this->id_.empty());
-
-    this->boolean_operation_ = get_json_value(sketch, "booleanOperation", -1);
-    switch (this->boolean_operation_)
+    try 
     {
-        case -1:
+        vgg["id"] = sketch.at("do_objectID");
+        this->id_ = vgg["id"].get<string>();
+        assert(!this->id_.empty());
+
+        this->boolean_operation_ = get_json_value(sketch, "booleanOperation", -1);
+        switch (this->boolean_operation_)
         {
-            this->boolean_operation_ = 4;
-            break;
+            case -1:
+            {
+                this->boolean_operation_ = 4;
+                break;
+            }
+
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            {
+                ++this->boolean_operation_;
+                break;
+            }
+
+            default:
+            {
+                throw sketch_exception("invalid boolean operator");
+            }
         }
 
-        case 0:
-        case 1:
-        case 2:
-        case 3:
+        //bounds frame matrix
         {
-            ++this->boolean_operation_;
-            break;
+            rect_change::change(sketch.at("frame"), vgg["bounds"]);
+
+            double matrix[6] = {};
+            rect_change::matrix_calc(matrix,
+                get_json_value(sketch, "isFlippedHorizontal", false),
+                get_json_value(sketch, "isFlippedVertical", false),
+                get_json_value(sketch, "rotation", 0.0),
+                vgg["bounds"].at("x").get<double>(), 
+                vgg["bounds"].at("y").get<double>(),
+                vgg["bounds"].at("width").get<double>(), 
+                vgg["bounds"].at("height").get<double>());
+            rect_change::form_matrix(matrix, vgg["matrix"]);
+
+            rect_change::calc_frame(matrix, vgg["bounds"], vgg["frame"]);
+
+            // 备注: bounds的起点固定为(0, 0)
+            vgg["bounds"].at("x") = 0.0;
+            vgg["bounds"].at("y") = 0.0;
         }
 
-        default:
+        vgg["isLocked"] = get_json_value(sketch, "isLocked", false);
+        vgg["visible"] = get_json_value(sketch, "isVisible", true);
+        vgg["name"] = get_json_value(sketch, "name", string("empty-name"));
+
+        if (sketch.find("style") == sketch.end())
         {
-            throw sketch_exception("invalid boolean operator");
+            style_change::get_default(vgg["style"]);
+            context_settings_change::get_default(vgg["contextSettings"]);
         }
-    }
+        else 
+        {
+            style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"]);
+        }
 
-    //bounds frame matrix
+        /*
+        hasClippingMask
+            true: 自身是蒙版
+            false: 自身不是蒙版
+        clippingMaskMode 仅在 hasClippingMask 为 true 时有效
+            0: outline mask
+            1: alpha mask
+        */
+        if (get_json_value(sketch, "hasClippingMask", false))
+        {
+            this->mask_type_ = sketch.at("clippingMaskMode").get<int>() + 1;
+        }
+        else 
+        {
+            this->mask_type_ = 0;
+        }
+        this->break_mask_chain_ = get_json_value(sketch, "shouldBreakMaskChain", false);
+
+        //这两个属性由子类自行设置
+        vgg["alphaMaskBy"] = nlohmann::json::array();
+        vgg["outlineMaskBy"] = nlohmann::json::array();
+
+        vgg["isMask"] = static_cast<bool>(this->mask_type_);
+
+        /*
+        未处理的项:
+        exportOptions
+        flow
+        isFixedToViewport
+        isTemplate
+        layerListExpandedType
+        nameIsFixed
+        resizingConstraint
+        resizingType
+        sharedStyleID
+        userInfo
+        maintainScrollPosition
+        */
+    }
+    catch(sketch_exception &e)
     {
-        rect_change::change(*get_json_item(sketch, "frame", "fail to get obj frame"), vgg["bounds"]);
-
-        double matrix[6] = {};
-        rect_change::matrix_calc(matrix,
-            get_json_value(sketch, "isFlippedHorizontal", false),
-            get_json_value(sketch, "isFlippedVertical", false),
-            get_json_value(sketch, "rotation", 0.0),
-            vgg["bounds"].at("x").get<double>(), 
-            vgg["bounds"].at("y").get<double>(),
-            vgg["bounds"].at("width").get<double>(), 
-            vgg["bounds"].at("height").get<double>());
-        rect_change::form_matrix(matrix, vgg["matrix"]);
-
-        rect_change::calc_frame(matrix, vgg["bounds"], vgg["frame"]);
-
-        // 备注: bounds的起点固定为(0, 0)
-        vgg["bounds"].at("x") = 0.0;
-        vgg["bounds"].at("y") = 0.0;
+        throw e;
     }
-
-    vgg["isLocked"] = get_json_value(sketch, "isLocked", false);
-    vgg["visible"] = get_json_value(sketch, "isVisible", true);
-    vgg["name"] = get_json_value(sketch, "name", string("empty-name"));
-
-    if (sketch.find("style") == sketch.end())
+    catch(...)
     {
-        style_change::get_default(vgg["style"]);
-        context_settings_change::get_default(vgg["contextSettings"]);
+        assert(false);
+        throw sketch_exception("fail to analyze abstract layer");
     }
-    else 
-    {
-        style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"]);
-    }
-
-    /*
-    hasClippingMask
-        true: 自身是蒙版
-        false: 自身不是蒙版
-    clippingMaskMode 仅在 hasClippingMask 为 true 时有效
-        0: outline mask
-        1: alpha mask
-    */
-    
-    if (get_json_value(sketch, "hasClippingMask", false))
-    {
-        get_json_value<int, int>(sketch, "clippingMaskMode", this->mask_type_, "fail to get obj clipping mask mode");
-        ++this->mask_type_;
-    }
-    else 
-    {
-        this->mask_type_ = 0;
-    }
-    this->break_mask_chain_ = get_json_value(sketch, "shouldBreakMaskChain", false);
-
-    //这两个属性由子类自行设置
-    vgg["alphaMaskBy"] = nlohmann::json::array();
-    vgg["outlineMaskBy"] = nlohmann::json::array();
-
-    vgg["isMask"] = static_cast<bool>(this->mask_type_);
-
-    /*
-    未处理的项:
-    exportOptions
-    flow
-    isFixedToViewport
-    isTemplate
-    layerListExpandedType
-    nameIsFixed
-    resizingConstraint
-    resizingType
-    sharedStyleID
-    userInfo
-    maintainScrollPosition
-    */
 }
 
 void abstract_layer::create_default_layer(nlohmann::json &vgg)

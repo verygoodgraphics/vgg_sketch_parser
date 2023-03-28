@@ -46,56 +46,67 @@ void artboard::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     vgg["class"] = "artboard";
     vgg["hasBackgroundColor"] = get_json_value(sketch, "hasBackgroundColor", false);
 
-    auto it = sketch.find("backgroundColor");
-    if (it != sketch.end())
+    try 
     {
-        color_change::change(*it, vgg["backgroundColor"]);
-    }
-    else if (vgg["hasBackgroundColor"].get<bool>())
-    {
-        throw sketch_exception("fail to get artboard background color");
-    }
-    
-    nlohmann::json vgg_layer;
-    abstract_layer::create_default_layer(vgg_layer);
-
-    auto layers = get_json_item(sketch, "layers", "fail to get artboard layers");
-    for (auto &item : *layers)
-    {
-        string name;
-        get_json_value<string, string>(item, "_class", name, "fail to get artboard child _class");
-
-        auto it = child_.find(name);
-        if (it != child_.end())
+        auto it = sketch.find("backgroundColor");
+        if (it != sketch.end())
         {
-            nlohmann::json out;
-            it->second->change(item, out);
-
-            m_mask.deal_mask(*it->second, out);
-
-            assert(!out.empty());
-            vgg_layer["childObjects"].emplace_back(std::move(out));
+            color_change::change(*it, vgg["backgroundColor"]);
         }
-        else 
+        else if (vgg["hasBackgroundColor"].get<bool>())
         {
-            assert(name == "slice" || name == "MSImmutableHotspotLayer");
+            throw sketch_exception("fail to get artboard background color");
         }
+        
+        nlohmann::json vgg_layer;
+        abstract_layer::create_default_layer(vgg_layer);
+
+        auto &layers = sketch.at("layers");
+        for (auto &item : layers)
+        {
+            string name = item.at("_class").get<string>();
+            auto it = child_.find(name);
+
+            if (it != child_.end())
+            {
+                nlohmann::json out;
+                it->second->change(item, out);
+
+                m_mask.deal_mask(*it->second, out);
+
+                assert(!out.empty());
+                vgg_layer["childObjects"].emplace_back(std::move(out));
+            }
+            else 
+            {
+                assert(name == "slice" || name == "MSImmutableHotspotLayer");
+            }
+        }
+
+        //artboard的起点固定为(0, 0)
+        vgg["frame"].at("x") = 0.0;
+        vgg["frame"].at("y") = 0.0;
+        rect_change::get_default_matrix(vgg["matrix"]);
+
+        vgg_layer["frame"] = vgg.at("frame");
+        vgg_layer["bounds"] = vgg.at("bounds");
+        vgg["layers"].emplace_back(std::move(vgg_layer));
+
+        /*
+        sketch中未处理的属性包括: 
+        includeBackgroundColorInExport
+        isFlowHome
+        resizesContent
+        prototypeViewport
+        */
     }
-
-    //artboard的起点固定为(0, 0)
-    vgg["frame"].at("x") = 0.0;
-    vgg["frame"].at("y") = 0.0;
-    rect_change::get_default_matrix(vgg["matrix"]);
-
-    vgg_layer["frame"] = vgg.at("frame");
-    vgg_layer["bounds"] = vgg.at("bounds");
-    vgg["layers"].emplace_back(std::move(vgg_layer));
-
-    /*
-    sketch中未处理的属性包括: 
-    includeBackgroundColorInExport
-    isFlowHome
-    resizesContent
-    prototypeViewport
-    */
+    catch(sketch_exception &e)
+    {
+        throw e;
+    }
+    catch(...)
+    {
+        assert(false);
+        throw sketch_exception("fail to analyze artboard");
+    }
 }

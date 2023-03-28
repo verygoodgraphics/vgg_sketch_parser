@@ -44,54 +44,77 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
     assert(sketch.at("_class").get<string>() == "symbolMaster");
 
-    vgg["class"] = string("symbolMaster");
-    vgg["hasBackgroundColor"] = get_json_value(sketch, "hasBackgroundColor", false);
-
-    color_change::change(*get_json_item(sketch, "backgroundColor", "fail to get symbol master attr: backgroundColor"), vgg["backgroundColor"]);
-    vgg["includeBackgroundColorInInstance"] = get_json_value(sketch, "includeBackgroundColorInInstance", true);
-    get_json_value<string>(sketch, "symbolID", vgg["symbolID"], "fail to get symbol master attr: symbolID");
-    vgg["allowsOverrides"] = get_json_value(sketch, "allowsOverrides", false);
-
-    vgg["overrideProperties"] = nlohmann::json::array();
-    auto it = sketch.find("overrideProperties");
-    if (it != sketch.end())
+    try 
     {
-        symbol_master::override_properties_change(*it, vgg["overrideProperties"]);
+        vgg["class"] = string("symbolMaster");
+        vgg["hasBackgroundColor"] = get_json_value(sketch, "hasBackgroundColor", false);
+
+        auto it = sketch.find("backgroundColor");
+        if (it != sketch.end())
+        {
+            color_change::change(*it, vgg["backgroundColor"]);
+        }
+        else if (vgg["hasBackgroundColor"].get<bool>())
+        {
+            throw sketch_exception("fail to get symbol master background color");
+        }
+
+        vgg["includeBackgroundColorInInstance"] = get_json_value(sketch, "includeBackgroundColorInInstance", true);
+        vgg["symbolID"] = sketch.at("symbolID").get<string>();
+        vgg["allowsOverrides"] = get_json_value(sketch, "allowsOverrides", false);
+
+        vgg["overrideProperties"] = nlohmann::json::array();
+        it = sketch.find("overrideProperties");
+        if (it != sketch.end())
+        {
+            symbol_master::override_properties_change(*it, vgg["overrideProperties"]);
+        }
+        
+        vgg["childObjects"] = nlohmann::json::array();
+        
+        auto &layers = sketch.at("layers");
+        for (auto &item : layers)
+        {
+            string name = item.at("_class").get<string>();
+
+            auto it = child_.find(name);
+            if (it != child_.end())
+            {
+                nlohmann::json out;
+                it->second->change(item, out);
+
+                m_mask.deal_mask(*it->second, out);
+
+                assert(!out.empty());
+                vgg["childObjects"].emplace_back(std::move(out));
+            }
+            else 
+            {
+                assert(name == "slice" || name == "MSImmutableHotspotLayer");
+            }
+        }
+
+        /*
+        sketch中未处理的属性包括:
+        includeBackgroundColorInExport
+        isFlowHome
+        resizesContent
+        presetDictionary
+        */
     }
-    
-    vgg["childObjects"] = nlohmann::json::array();
-    
-    auto layers = get_json_item(sketch, "layers", "fail to get symbol master attr: layers");
-    for (auto &item : *layers)
+    catch(sketch_exception &e)
     {
-        string name;
-        get_json_value<string>(item, "_class", name, "fail to get symbol master child attr: _class");
-
-        auto it = child_.find(name);
-        if (it != child_.end())
-        {
-            nlohmann::json out;
-            it->second->change(item, out);
-
-            m_mask.deal_mask(*it->second, out);
-
-            assert(!out.empty());
-            vgg["childObjects"].emplace_back(std::move(out));
-        }
-        else 
-        {
-            assert(name == "slice" || name == "MSImmutableHotspotLayer");
-        }
+        throw e;
     }
-
-    /*
-    sketch中未处理的属性包括:
-    includeBackgroundColorInExport
-    isFlowHome
-    resizesContent
-    presetDictionary
-    */
+    catch(...)
+    {
+        assert(false);
+        throw sketch_exception("fail to analyze symbol master");
+    }       
 }
+
+//调试
+#include <fstream>
 
 void symbol_master::override_name_check(const string &str)
 {
@@ -109,7 +132,14 @@ void symbol_master::override_name_check(const string &str)
         return std::regex_match(str, re);
     }))
     {
-        throw sketch_exception("fail to match override name");
+        //调试 临时注释
+        //throw sketch_exception("fail to match override name");
+        
+        //调试
+        static std::ofstream ofs("out.txt");
+        ofs.write(str.c_str(), str.size());
+        ofs.write("\n", 1);
+        ofs.flush();
     }
 }
 
@@ -136,6 +166,10 @@ void symbol_master::override_properties_change(const nlohmann::json &sketch, nlo
 
             vgg.emplace_back(std::move(vgg_item));
         }
+    }
+    catch (sketch_exception &e)
+    {
+        throw e;
     }
     catch (...)
     {

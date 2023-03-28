@@ -29,57 +29,71 @@ SOFTWARE.
 void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     assert(sketch.at("_class").get<string>() == "bitmap");
-
     abstract_layer::change(sketch, vgg);
 
     vgg["class"] = string("image");
     vgg["fillReplacesImage"] = get_json_value(sketch, "fillReplacesImage", false);
     
-    string file_name;
-    bitmap::get_image_file_name(*get_json_item(sketch, "image", "fail to get bitmap image"), file_name);
-    vgg["imageFileName"] = file_name;
+    try 
+    {
+        string file_name;
+        bitmap::get_image_file_name(sketch.at("image"), file_name);
+        vgg["imageFileName"] = file_name;
 
-    /*
-    sketch中未处理的属性包括:
-    intendedDPI
-    clippingMask
-    */
+        /*
+        sketch中未处理的属性包括:
+        intendedDPI
+        clippingMask
+        */
+    }
+    catch(sketch_exception &e)
+    {
+        throw e;
+    }
+    catch(...)
+    {
+        assert(false);
+        throw sketch_exception("fail to analyze bitmap");
+    }
 }
 
 void bitmap::get_image_file_name(const nlohmann::json &sketch, string &out)
 {
     out.clear();
 
-    string class_name;
-    get_json_value<string>(sketch, "_class", class_name, "fail to get bitmap data attr: _class");
-
-    if (class_name == "MSJSONFileReference")
+    try 
     {
-        string ref_class;
-        get_json_value<string>(sketch, "_ref_class", ref_class, "fail to get bitmap image data attr: _ref_class");
+        string class_name = sketch.at("_class").get<string>();
+        assert(class_name == "MSJSONFileReference" || class_name == "MSJSONOriginalDataReference");
 
-        if (ref_class == "MSImageData")
+        if (class_name == "MSJSONFileReference")
         {
-            get_json_value<string>(sketch, "_ref", out, "fail to get bitmap data attr: _ref");
-
-            assert(boost::starts_with(out, extract::_images_dir_name));
-            boost::replace_all(out, extract::_images_dir_name, analyze_sketch_file::_out_dir_name);
+            if (sketch.at("_ref_class") == "MSImageData")
+            {
+                out = sketch.at("_ref").get<string>();
+                assert(boost::starts_with(out, extract::_images_dir_name));
+                boost::replace_all(out, extract::_images_dir_name, analyze_sketch_file::_out_dir_name);
+            }
+            else 
+            {
+                //szn_todo
+                throw sketch_exception("now only can deal MSImageData in file-ref");
+            }
         }
         else 
         {
             //szn_todo
-            throw sketch_exception("now only can deal MSImageData in file-ref");
+            throw sketch_exception("can not analyze data-ref");
         }
     }
-    else if (class_name == "MSJSONOriginalDataReference")
+    catch(sketch_exception &e)
     {
-        //szn_todo
-        throw sketch_exception("can not analyze data-ref");
+        throw e;
     }
-    else 
+    catch(...)
     {
-        throw sketch_exception("unknow bitmap data type");
+        throw sketch_exception("fail to get image file name");
     }
-
+    
     assert(boost::starts_with(out, analyze_sketch_file::_out_dir_name) && std::filesystem::is_regular_file(out));
 }

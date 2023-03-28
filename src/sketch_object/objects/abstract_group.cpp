@@ -35,40 +35,50 @@ abstract_group::abstract_group()
 void abstract_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     abstract_layer::change(sketch, vgg);
-
     assert(sketch.at("_class").get<string>() == "group");
-   
+
     mask m_mask;
 
     vgg["class"] = "group";
     vgg["childObjects"] = nlohmann::json::array();
 
-    auto layers = get_json_item(sketch, "layers", "fail to get group layers");
-    for (auto &item : *layers)
+    try 
     {
-        string name;
-        get_json_value<string, string>(sketch, "_class", name, "fail to get group child _class");
-
-        auto it = child_.find(name);
-        if (it != child_.end())
+        auto &layers = sketch.at("layers");
+        for (auto &item : layers)
         {
-            nlohmann::json out;
-            it->second->change(item, out);
+            string name = item.at("_class");
+            auto it = child_.find(name);
             
-            m_mask.deal_mask(*it->second, out);
+            if (it != child_.end())
+            {
+                nlohmann::json out;
+                it->second->change(item, out);
+                
+                m_mask.deal_mask(*it->second, out);
 
-            assert(!out.empty());
-            vgg["childObjects"].emplace_back(std::move(out));
+                assert(!out.empty());
+                vgg["childObjects"].emplace_back(std::move(out));
+            }
+            else 
+            {
+                assert(name == "slice" || name == "MSImmutableHotspotLayer");
+            }
         }
-        else 
-        {
-            assert(name == "slice" || name == "MSImmutableHotspotLayer");
-        }
+
+        /*
+        sketch中未处理的属性包括:
+        hasClickThrough
+        groupLayout
+        */
     }
-
-    /*
-    sketch中未处理的属性包括:
-    hasClickThrough
-    groupLayout
-    */
+    catch(sketch_exception &e)
+    {
+        throw e;
+    }
+    catch(...)
+    {
+        assert(false);
+        throw sketch_exception("fail to analyze group");
+    }
 }

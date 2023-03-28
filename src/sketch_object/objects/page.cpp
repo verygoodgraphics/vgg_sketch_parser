@@ -47,16 +47,14 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     std::optional<nlohmann::json> default_artboard;
     std::optional<rect> default_artboard_rect;
 
-
     assert(sketch.at("_class").get<string>() == "page");
     
-    auto layers = get_json_item(sketch, "layers", "fail to get page layers");
-    for (auto &item : *layers)
+    auto &layers = sketch.at("layers");
+    for (auto &item : layers)
     {
-        string name;
-        get_json_value<string>(item, "_class", name, "fail to get page child attr: _class");
-
+        string name = item.at("_class").get<string>();
         auto it = child_.find(name);
+        
         if (it != child_.end())
         {
             nlohmann::json out;

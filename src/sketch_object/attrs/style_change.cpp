@@ -1,4 +1,28 @@
-﻿#include "./style_change.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./style_change.h"
 #include "src/sketch_object/attrs/border_change.h"
 #include "src/sketch_object/attrs/fill_change.h"
 #include "src/sketch_object/attrs/blur_change.h"
@@ -43,20 +67,18 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
         auto it = sketch.find("colorControls");
         if (it != sketch.end())
         {
-            color_control_change::change(sketch.at("colorControls"), vgg["colorControls"]);
+            color_control_change::change(*it, vgg["colorControls"]);
         }
 
         //borders
         it = sketch.find("borders");
         if (it != sketch.end())
         {
-            auto &border = sketch.at("borders");
-
             //borderOptions 在 sketch-schema 1.0 中是可选的
             auto it_border_option = sketch.find("borderOptions");
             const nlohmann::json *border_option = it_border_option == sketch.end() ? nullptr : &*it_border_option;
 
-            for (auto &item : border)
+            for (auto &item : *it)
             {
                 nlohmann::json tem;
                 border_change::change(item, border_option, tem);

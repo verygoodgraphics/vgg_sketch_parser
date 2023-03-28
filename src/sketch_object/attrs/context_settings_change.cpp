@@ -1,33 +1,47 @@
-﻿#include "./context_settings_change.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./context_settings_change.h"
 #include "src/sketch_object/check.hpp"
+#include "src/basic/get_json_value.hpp"
 
 void context_settings_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     vgg.clear();
 
-    try 
-    {
-        assert(sketch.at("_class").get<string>() == "graphicsContextSettings");
+    assert(sketch.at("_class").get<string>() == "graphicsContextSettings");
 
-        vgg["class"] = string("graphicsContextSettings");
+    vgg["class"] = string("graphicsContextSettings");
 
-        vgg["blendMode"] = sketch.at("blendMode");
-        range_check(vgg["blendMode"].get<int>(), 0, 17, "invalid blend mode");
+    vgg["blendMode"] = get_json_value(sketch, "blendMode", 0);
+    range_check(vgg["blendMode"].get<int>(), 0, 17, "invalid blend mode");
 
-        vgg["opacity"] = sketch.at("opacity");
-        range_check(vgg["opacity"].get<double>(), 0.0, 1.0, "invalid opacity");
+    vgg["opacity"] = get_json_value(sketch, "opacity", 0.0);
+    range_check(vgg["opacity"].get<double>(), 0.0, 1.0, "invalid opacity");
 
-        vgg["isolateBlending"] = false;
-        vgg["transparencyKnockoutGroup"] = 0;
-    }
-    catch (sketch_exception &e)
-    {
-        throw e;
-    }
-    catch(...)
-    {
-        throw sketch_exception("context-settings change fail");
-    }
+    vgg["isolateBlending"] = false;
+    vgg["transparencyKnockoutGroup"] = 0;
 }
 
 void context_settings_change::get_default(nlohmann::json &out)

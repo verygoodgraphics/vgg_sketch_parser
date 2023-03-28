@@ -29,7 +29,7 @@ SOFTWARE.
 #include "nlohmann/json.hpp"
 
 /**
- * 获取输入的 json 中的给定 key 的值, 若 key 不存在, 则返回 default_value
+ * 获取输入的 json 中的给定 key 的值, 若 key 获取异常, 则返回 default_value
  * 
  * @param json_in 输入的 json
  * @param key 访问的 key 名称
@@ -38,54 +38,14 @@ SOFTWARE.
 template <typename T>
 const T get_json_value(const nlohmann::json &json_in, const char *key, const T &default_value)
 {
-    auto it = json_in.find(key);
-    if (it == json_in.end())
+    try 
+    {
+        return json_in.at(key).get<T>();
+    }
+    catch(...)
     {
         return default_value;
     }
-
-    return it->get<T>();
 }
-
-/**
- * 获取输入的 json 中的给定 key 的值, 若 key 不存在, 则触发异常
- * 
- * @param json_in 输入的 json
- * @param key 访问的 key 名称
- * @param out 保存获取到的值
- * @param fail_reason 用于构造异常信息
- * 
- * @exception sketch_exception
-*/
-template <typename T, typename U>
-void get_json_value(const nlohmann::json &json_in, const char *key, U &out, const char *fail_reason)
-{
-    auto it = json_in.find(key);
-    if (it == json_in.end())
-    {
-        assert(false);
-        throw sketch_exception(fail_reason);
-    }
-    else 
-    {
-        out = it->get<T>();
-    }
-}
-
-/**
- * 获取输入的 json 中的指定 key, 若不存在则抛出异常
- * 
- * @param json_in 输入的 json
- * @param key 访问的 key 名称
- * @param fail_reason 用于构造异常信息
- * 
- * @exception sketch_exception
-*/
-const nlohmann::json::const_iterator get_json_item
-(   
-    const nlohmann::json &json_in, 
-    const char *key, 
-    const char *fail_reason
-);
 
 #endif

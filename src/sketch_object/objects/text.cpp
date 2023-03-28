@@ -1,4 +1,28 @@
-﻿#include "./text.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./text.h"
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/sketch_object/attrs/context_settings_change.h"
 #include "src/sketch_object/check.hpp"
@@ -12,13 +36,13 @@ void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     {
         vgg["class"] = string("text");
         text::attributed_string_change(sketch.at("attributedString"), vgg);
-
-        if (sketch.at("automaticallyDrawOnUnderlyingPath").get<bool>())
+        
+        if (get_json_value(sketch, "automaticallyDrawOnUnderlyingPath", false))
         {
             vgg["textOnPath"]["class"] = string("textOnPath");
         }
 
-        int text_behavious = sketch.at("textBehaviour").get<int>();
+        int text_behavious = get_json_value(sketch, "textBehaviour", 0);
         switch (text_behavious)
         {
             case 0:
@@ -250,8 +274,14 @@ void text::font_descriptor_change(const nlohmann::json &sketch, nlohmann::json &
 
     try
     {
-        vgg["name"] = sketch.at("attributes").at("name").get<string>();
-        vgg["size"] = sketch.at("attributes").at("size").get<double>();
+        auto &attr = sketch.at("attributes");
+        auto it = attr.find("name");
+        if (it != attr.end())
+        {
+            vgg["name"] = it->get<string>();
+        }
+
+        vgg["size"] = attr.at("size").get<double>();
     }
     catch(...)
     {

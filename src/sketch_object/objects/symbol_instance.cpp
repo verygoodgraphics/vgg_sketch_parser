@@ -32,24 +32,36 @@ void symbol_instance::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     assert(sketch.at("_class").get<string>() == "symbolInstance");
     abstract_layer::change(sketch, vgg);
 
-    vgg["class"] = string("symbolInstance");
-
-    vgg["overrideValues"] = nlohmann::json::array();
-    auto it = sketch.find("overrideValues");
-    if (it != sketch.end())
+    try 
     {
-        symbol_instance::override_values_change(*it, vgg["overrideValues"]);
+        vgg["class"] = string("symbolInstance");
+
+        vgg["overrideValues"] = nlohmann::json::array();
+        auto it = sketch.find("overrideValues");
+        if (it != sketch.end())
+        {
+            symbol_instance::override_values_change(*it, vgg["overrideValues"]);
+        }
+
+        vgg["symbolID"] = sketch.at("symbolID").get<string>();
+
+        /*
+        sketch中未处理的属性包括:
+        scale: 无需处理, scale 变化的时候, frame 也会变化
+        verticalSpacing
+        horizontalSpacing
+        preservesSpaceWhenHidden
+        */
     }
-
-    get_json_value<string>(sketch, "symbolID", vgg["symbolID"], "fail to get symbol instance attr: symbolID");
-
-    /*
-    sketch中未处理的属性包括:
-    scale: 无需处理, scale 变化的时候, frame 也会变化
-    verticalSpacing
-    horizontalSpacing
-    preservesSpaceWhenHidden
-    */
+    catch(sketch_exception &e)
+    {
+        throw e;
+    }
+    catch(...)
+    {
+        assert(false);
+        throw sketch_exception("fail to analyze symbol instance");
+    }
 }
 
 void symbol_instance::override_values_change(const nlohmann::json &sketch, nlohmann::json &vgg)

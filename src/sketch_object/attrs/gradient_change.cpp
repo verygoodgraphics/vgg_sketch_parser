@@ -1,7 +1,32 @@
-﻿#include "./gradient_change.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./gradient_change.h"
 #include "src/sketch_object/check.hpp"
 #include "src/sketch_object/utils/point_string_change.h"
 #include "src/sketch_object/attrs/color_change.h"
+#include "src/basic/get_json_value.hpp"
 
 void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
@@ -19,7 +44,7 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         gradient_change::gradient_stops_change(sketch.at("stops"), gradient["stops"]);
         gradient["invert"] = false;
 
-        int type = sketch.at("gradientType").get<int>();
+        int type = get_json_value(sketch, "gradientType", 0);
         switch (type)
         {
             case 0:
@@ -63,32 +88,26 @@ void gradient_change::gradient_stops_change(const nlohmann::json &sketch, nlohma
     vgg.clear();
     assert(sketch.is_array());
 
-    try
+    nlohmann::json tem;
+
+    for (auto &item : sketch)
     {
-        assert(sketch.is_array());
+        assert(item.at("_class").get<string>() == "gradientStop");
+        tem["class"] = std::string("gradientStop");
+        tem["midPoint"] = 0.5;
 
-        nlohmann::json tem;
+        tem["position"] = get_json_value(item, "position", 0.0);
+        range_check(tem["position"].get<double>(), 0.0, 1.0, "invalid gradient stop position");
 
-        for (auto &item : sketch)
+        try 
         {
-            assert(item.at("_class").get<string>() == "gradientStop");
-            tem["class"] = std::string("gradientStop");
-            tem["midPoint"] = 0.5;
-
-            tem["position"] = item.at("position");
-            range_check(tem["position"].get<double>(), 0.0, 1.0, "invalid gradient stop position");
-
             color_change::change(item.at("color"), tem["color"]);
-
-            vgg.emplace_back(std::move(tem));
         }
-    }
-    catch (sketch_exception &e)
-    {
-        throw e;
-    }
-    catch(...)
-    {
-        throw sketch_exception("fail to change gradient stops");
+        catch(...)
+        {
+            color_change::get_default(tem["color"]);
+        }
+
+        vgg.emplace_back(std::move(tem));
     }
 }
