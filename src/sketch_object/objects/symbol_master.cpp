@@ -1,4 +1,28 @@
-﻿#include "./symbol_master.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./symbol_master.h"
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/sketch_object/mask.h"
 #include <regex>
@@ -18,56 +42,55 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     abstract_root::change(sketch, vgg);
     mask m_mask;
 
-    try
-    {
-        assert(sketch.at("_class").get<string>() == "symbolMaster");
+    assert(sketch.at("_class").get<string>() == "symbolMaster");
 
-        vgg["class"] = string("symbolMaster");
-        vgg["hasBackgroundColor"] = sketch.at("hasBackgroundColor").get<bool>();
-        color_change::change(sketch.at("backgroundColor"), vgg["backgroundColor"]);
-        vgg["includeBackgroundColorInInstance"] = sketch.at("includeBackgroundColorInInstance").get<bool>();
-        vgg["symbolID"] = sketch.at("symbolID").get<string>();
-        vgg["allowsOverrides"] = sketch.at("allowsOverrides").get<bool>();
-        symbol_master::override_properties_change(sketch.at("overrideProperties"), vgg["overrideProperties"]);
-        vgg["childObjects"] = nlohmann::json::array();
-        
-        auto &layers = sketch.at("layers");
-        for (auto &item : layers)
+    vgg["class"] = string("symbolMaster");
+    vgg["hasBackgroundColor"] = get_json_value(sketch, "hasBackgroundColor", false);
+
+    color_change::change(*get_json_item(sketch, "backgroundColor", "fail to get symbol master attr: backgroundColor"), vgg["backgroundColor"]);
+    vgg["includeBackgroundColorInInstance"] = get_json_value(sketch, "includeBackgroundColorInInstance", true);
+    get_json_value<string>(sketch, "symbolID", vgg["symbolID"], "fail to get symbol master attr: symbolID");
+    vgg["allowsOverrides"] = get_json_value(sketch, "allowsOverrides", false);
+
+    vgg["overrideProperties"] = nlohmann::json::array();
+    auto it = sketch.find("overrideProperties");
+    if (it != sketch.end())
+    {
+        symbol_master::override_properties_change(*it, vgg["overrideProperties"]);
+    }
+    
+    vgg["childObjects"] = nlohmann::json::array();
+    
+    auto layers = get_json_item(sketch, "layers", "fail to get symbol master attr: layers");
+    for (auto &item : *layers)
+    {
+        string name;
+        get_json_value<string>(item, "_class", name, "fail to get symbol master child attr: _class");
+
+        auto it = child_.find(name);
+        if (it != child_.end())
         {
-            string name = item.at("_class").get<string>();
-            auto it = child_.find(name);
-            if (it != child_.end())
-            {
-                nlohmann::json out;
-                it->second->change(item, out);
+            nlohmann::json out;
+            it->second->change(item, out);
 
-                m_mask.deal_mask(*it->second, out);
+            m_mask.deal_mask(*it->second, out);
 
-                assert(!out.empty());
-                vgg["childObjects"].emplace_back(std::move(out));
-            }
-            else 
-            {
-                assert(name == "slice" || name == "MSImmutableHotspotLayer");
-            }
+            assert(!out.empty());
+            vgg["childObjects"].emplace_back(std::move(out));
         }
+        else 
+        {
+            assert(name == "slice" || name == "MSImmutableHotspotLayer");
+        }
+    }
 
-        /*
-        sketch中未处理的属性包括:
-        includeBackgroundColorInExport
-        isFlowHome
-        resizesContent
-        presetDictionary
-        */
-    }
-    catch(sketch_exception &e)
-    {
-        throw e;
-    }
-    catch(...)
-    {
-        throw sketch_exception("fail to analyze symbol master");
-    }
+    /*
+    sketch中未处理的属性包括:
+    includeBackgroundColorInExport
+    isFlowHome
+    resizesContent
+    presetDictionary
+    */
 }
 
 void symbol_master::override_name_check(const string &str)

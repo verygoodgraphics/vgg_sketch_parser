@@ -1,4 +1,28 @@
-﻿#include "./symbol_instance.h"
+﻿/*
+MIT License
+
+Copyright (c) 2023 Very Good Graphics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "./symbol_instance.h"
 #include "./symbol_master.h"
 #include "src/sketch_object/attrs/file_ref_change.h"
 #include "src/sketch_object/attrs/data_ref_change.h"
@@ -8,28 +32,24 @@ void symbol_instance::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     assert(sketch.at("_class").get<string>() == "symbolInstance");
     abstract_layer::change(sketch, vgg);
 
-    try 
-    {
-        vgg["class"] = string("symbolInstance");
-        symbol_instance::override_values_change(sketch.at("overrideValues"), vgg["overrideValues"]);
-        vgg["symbolID"] = sketch.at("symbolID").get<string>();
+    vgg["class"] = string("symbolInstance");
 
-        /*
-        sketch中未处理的属性包括:
-        scale: 无需处理, scale 变化的时候, frame 也会变化
-        verticalSpacing
-        horizontalSpacing
-        preservesSpaceWhenHidden
-        */
-    }
-    catch(sketch_exception &e)
+    vgg["overrideValues"] = nlohmann::json::array();
+    auto it = sketch.find("overrideValues");
+    if (it != sketch.end())
     {
-        throw e;
+        symbol_instance::override_values_change(*it, vgg["overrideValues"]);
     }
-    catch(...)
-    {
-        throw sketch_exception("fail to analyze symbol instance");
-    }
+
+    get_json_value<string>(sketch, "symbolID", vgg["symbolID"], "fail to get symbol instance attr: symbolID");
+
+    /*
+    sketch中未处理的属性包括:
+    scale: 无需处理, scale 变化的时候, frame 也会变化
+    verticalSpacing
+    horizontalSpacing
+    preservesSpaceWhenHidden
+    */
 }
 
 void symbol_instance::override_values_change(const nlohmann::json &sketch, nlohmann::json &vgg)
