@@ -113,12 +113,10 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     }       
 }
 
-//调试
-#include <fstream>
-
 void symbol_master::override_name_check(const string &str)
 {
     //from override-name.yaml
+    /*
     const static std::array<std::regex, 4> a_re = 
     { 
         std::regex("[0-9A-F]{8}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{12}((_stringValue$)|\\/)"),
@@ -132,15 +130,11 @@ void symbol_master::override_name_check(const string &str)
         return std::regex_match(str, re);
     }))
     {
-        //调试 临时注释
-        //throw sketch_exception("fail to match override name");
-        
-        //调试
-        static std::ofstream ofs("out.txt");
-        ofs.write(str.c_str(), str.size());
-        ofs.write("\n", 1);
-        ofs.flush();
+        throw sketch_exception("fail to match override name");
     }
+    */
+
+   //备注: 不对该项进行校验
 }
 
 void symbol_master::override_properties_change(const nlohmann::json &sketch, nlohmann::json &vgg)
