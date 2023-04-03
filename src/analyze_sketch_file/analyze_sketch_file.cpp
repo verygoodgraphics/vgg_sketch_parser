@@ -27,6 +27,7 @@ SOFTWARE.
 #include "./analyze_sketch_file.h"
 #include "src/sketch_object/objects/page.h"
 #include "boost/algorithm/string.hpp"
+#include "src/sketch_object/mask.h"
 
 const char* analyze_sketch_file::_out_dir_name = "out";
 // optional<valijson::Schema> analyze_sketch_file::_document_schema;
@@ -167,6 +168,22 @@ void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file
         // }
 
         page_obj.change(page_json, json_out);
+    }
+
+    //处理蒙版
+    {
+        auto &artboards = json_out.at("artboard");
+        for (auto &item : artboards)
+        {
+            assert(item.at("layers").size() == 1);
+            mask::add_parent_mask_to_child(item.at("layers").at(0));
+        }
+
+        auto &symbol_masters = json_out.at("symbolMaster");
+        for (auto &item : symbol_masters)
+        {
+            mask::add_parent_mask_to_child(item);
+        }
     }
 }
 

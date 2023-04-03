@@ -58,10 +58,10 @@ void mask::deal_mask(const abstract_layer &obj, nlohmann::json &obj_json)
         }
     }
 
-    if (obj_json.find("childObjects") != obj_json.end())
-    {
-        this->add_parent_mask_to_child(obj_json);
-    }
+    // if (obj_json.find("childObjects") != obj_json.end())
+    // {
+    //     this->add_parent_mask_to_child(obj_json);
+    // }
 }
 
 void mask::add_parent_mask_to_child(nlohmann::json &parent)
@@ -75,6 +75,8 @@ void mask::add_parent_mask_to_child(nlohmann::json &parent)
             return;
         }
 
+        //确保 mask 按照堆栈顺序存储, 效率比较低
+        /*
         auto old = std::move(out);
         assert(out.empty());
 
@@ -87,11 +89,26 @@ void mask::add_parent_mask_to_child(nlohmann::json &parent)
         {
             out.emplace_back(std::move(item));
         }
+        */
+
+        //无视 mask 的堆栈顺序, 效率比较高
+        for (auto &item : in)
+        {
+            out.emplace_back(item);
+        }
     };
 
-    for (auto &item : parent.at("childObjects"))
+    auto it = parent.find("childObjects");
+    if (it == parent.end())
+    {
+        return;
+    }
+
+    for (auto &item : *it)
     {
         add(parent.at("outlineMaskBy"), item.at("outlineMaskBy"));
         add(parent.at("alphaMaskBy"), item.at("alphaMaskBy"));
+
+        add_parent_mask_to_child(item);
     }
 }

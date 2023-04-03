@@ -63,6 +63,16 @@ void rect_change::matrix_calc(double *matrix, bool flip_h, bool flip_v,
     a(2, 1) = 0;
     a(2, 2) = 1;
 
+    /*
+    备注: 
+        1.这里必须把旋转放在前面, 理由是旋转的角度的正负的定义问题
+        2.在 sketch 中, 经过水平翻转或垂直翻转后的 obj, 旋转30°, 和一个没有经过翻转的 obj 旋转 30°, 它们的旋转方向是不一样的
+    */
+    if (rotation)
+    {
+        a = ublas::matrix<double>(ublas::prod(a, rect_change::rotation(rotation, width, height)));
+    }
+
     if (flip_h)
     {
         a = ublas::matrix<double>(ublas::prod(a, rect_change::flip(width, true)));
@@ -71,11 +81,6 @@ void rect_change::matrix_calc(double *matrix, bool flip_h, bool flip_v,
     if (flip_v)
     {
         a = ublas::matrix<double>(ublas::prod(a, rect_change::flip(height, false)));
-    }
-
-    if (rotation)
-    {
-        a = ublas::matrix<double>(ublas::prod(a, rect_change::rotation(rotation, width, height)));
     }
     
     matrix[0] = a(0, 0);

@@ -73,13 +73,13 @@ private:
     */
     int mask_obj_type_ = 0;
 
-private:
+public:
     /**
      * 将父对象中的 mask 添加到子项中
      * 
      * @param parent 符合 vgg-format 的对象
     */
-    void add_parent_mask_to_child(nlohmann::json &parent);
+    static void add_parent_mask_to_child(nlohmann::json &parent);
 };
 
 #endif
