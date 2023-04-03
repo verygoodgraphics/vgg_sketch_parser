@@ -146,7 +146,8 @@ void page::create_default_artboard(nlohmann::json &out)
     rect_change::get_default_matrix(out["matrix"]);
     out["alphaMaskBy"] = nlohmann::json::array();
     out["outlineMaskBy"] = nlohmann::json::array();
-    out["isMask"] = false;
+    //out["isMask"] = false;
+    out["maskType"] = 0;
 
     out["class"] = "artboard";
     out["hasBackgroundColor"] = false;

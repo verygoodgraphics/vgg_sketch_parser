@@ -131,7 +131,8 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         vgg["alphaMaskBy"] = nlohmann::json::array();
         vgg["outlineMaskBy"] = nlohmann::json::array();
 
-        vgg["isMask"] = static_cast<bool>(this->mask_type_);
+        //vgg["isMask"] = static_cast<bool>(this->mask_type_);
+        vgg["maskType"] = this->mask_type_;
 
         /*
         未处理的项:
@@ -175,7 +176,8 @@ void abstract_layer::create_default_layer(nlohmann::json &vgg)
 
     vgg["alphaMaskBy"] = nlohmann::json::array();
     vgg["outlineMaskBy"] = nlohmann::json::array();
-    vgg["isMask"] = false;
+    //vgg["isMask"] = false;
+    vgg["maskType"] = 0;
 
     vgg["class"] = string("layer");
     vgg["childObjects"] = nlohmann::json::array();
