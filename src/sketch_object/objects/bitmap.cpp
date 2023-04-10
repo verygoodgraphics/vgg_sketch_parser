@@ -72,7 +72,7 @@ void bitmap::get_image_file_name(const nlohmann::json &sketch, string &out)
             {
                 out = sketch.at("_ref").get<string>();
                 assert(boost::starts_with(out, extract::_images_dir_name));
-                boost::replace_all(out, extract::_images_dir_name, analyze_sketch_file::_out_dir_name);
+                boost::replace_all(out, extract::_images_dir_name, analyze_sketch_file::_image_dir_name);
             }
             else 
             {
@@ -95,5 +95,5 @@ void bitmap::get_image_file_name(const nlohmann::json &sketch, string &out)
         throw sketch_exception("fail to get image file name");
     }
     
-    assert(boost::starts_with(out, analyze_sketch_file::_out_dir_name) && std::filesystem::is_regular_file(out));
+    //assert(boost::starts_with(out, analyze_sketch_file::_image_dir_name) && std::filesystem::is_regular_file(out));
 }

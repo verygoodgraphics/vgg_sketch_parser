@@ -6,6 +6,7 @@
 #include <regex>
 #include <filesystem>
 #include "boost/algorithm/string.hpp"
+#include <algorithm>
 
 //only for test
 int main(int, char **)
@@ -13,9 +14,10 @@ int main(int, char **)
     if (true)
     {
         std::filesystem::remove_all("./del");
-        std::filesystem::remove_all("./out");
         //const char *p_file_name = "Y:\\Desktop\\szn_sketch_test\\small.sketch";
-        const char *p_file_name = "Y:\\Desktop\\szn_sketch_test\\88.1.sketch";
+        const char *p_file_name = "Z:\\Desktop\\szn_sketch_test\\s0.sketch";
+        //const char *p_file_name = "Y:\\Desktop\\szn_sketch_test\\88.1.sketch";
+        
         zip_extract(p_file_name, "./del", nullptr, nullptr);
 
         auto size = std::filesystem::file_size(p_file_name);
@@ -25,7 +27,8 @@ int main(int, char **)
         assert(ifs.gcount() == size);
 
         nlohmann::json json_out;
-        analyze_sketch_file::analyze(file_buf.data(), size, "hello-sketch", json_out);
+        map<string, vector<char>> file_info;
+        analyze_sketch_file::analyze(file_buf.data(), size, "hello-sketch", json_out, file_info);
 
         auto str = json_out.dump();
 
@@ -33,6 +36,8 @@ int main(int, char **)
         ofs.write(str.c_str(), str.size());
         ofs.close();
     }
+    
+    /*
     else 
     {
         char *buf = new char[1024 * 1024 * 500];
@@ -83,6 +88,7 @@ int main(int, char **)
 
         std::cout << count << std::endl;
     }
+    */
 
     std::cout << "finish" << std::endl;
 }

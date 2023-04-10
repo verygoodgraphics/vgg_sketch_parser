@@ -29,7 +29,7 @@ SOFTWARE.
 #include "boost/algorithm/string.hpp"
 #include "src/sketch_object/mask.h"
 
-const char* analyze_sketch_file::_out_dir_name = "out";
+const char* analyze_sketch_file::_image_dir_name = "image";
 // optional<valijson::Schema> analyze_sketch_file::_document_schema;
 // optional<valijson::Schema> analyze_sketch_file::_meta_schema;
 // optional<valijson::Schema> analyze_sketch_file::_user_schema;
@@ -188,7 +188,7 @@ void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file
 }
 
 void analyze_sketch_file::analyze(const void* content, const size_t len,
-    const char* name, nlohmann::json &json_out)
+    const char* name, nlohmann::json &json_out, map<string, vector<char>> &out_file)
 {
     //analyze_sketch_file::init();
 
@@ -198,13 +198,13 @@ void analyze_sketch_file::analyze(const void* content, const size_t len,
     //将图片进行存储
     do
     {
-        try 
-        {
-            std::filesystem::create_directory(analyze_sketch_file::_out_dir_name);
-        }
-        catch(...)
-        {
-        }
+        // try 
+        // {
+        //     std::filesystem::create_directory(analyze_sketch_file::_out_dir_name);
+        // }
+        // catch(...)
+        // {
+        // }
 
         for (auto &item : sketch_file_info)
         {
@@ -212,15 +212,17 @@ void analyze_sketch_file::analyze(const void* content, const size_t len,
             {
                 string str = item.first;
                 std::filesystem::path m_path(str);
-                str = analyze_sketch_file::_out_dir_name + string("/") + m_path.filename().string();
+                str = analyze_sketch_file::_image_dir_name + string("/") + m_path.filename().string();
 
-                std::ofstream ofs(str, std::ios_base::binary);
-                if (!ofs.is_open())
-                {
-                    throw sketch_exception((boost::format("fail to create %1%") % str).str().c_str());
-                }
+                // std::ofstream ofs(str, std::ios_base::binary);
+                // if (!ofs.is_open())
+                // {
+                //     throw sketch_exception((boost::format("fail to create %1%") % str).str().c_str());
+                // }
 
-                ofs.write(item.second.data(), item.second.size());
+                // ofs.write(item.second.data(), item.second.size());
+                assert(out_file.find(str) == out_file.end());
+                out_file[str] = std::move(item.second);
             }
         }
 

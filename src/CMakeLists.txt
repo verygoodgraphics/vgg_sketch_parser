@@ -9,12 +9,11 @@ file(GLOB_RECURSE all_hpp ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 file(GLOB_RECURSE all_cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${all_h} ${all_hpp} ${all_cpp})
 
-#add_subdirectory(vgg_contrib)
 add_library(vgg_sketch_parser ${all_h} ${all_hpp} ${all_cpp})
-#add_executable(vgg_sketch_parser ${all_h} ${all_hpp} ${all_cpp})
 
-#szn_todo
-target_include_directories(vgg_sketch_parser PUBLIC ${VGG_CONTRIB_INCLUDE} ${szn_tmp_value})
+get_filename_component(tmp_path ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+target_include_directories(vgg_sketch_parser PUBLIC ${VGG_CONTRIB_INCLUDE} ${tmp_path})
+
 target_link_libraries(vgg_sketch_parser PRIVATE zip)
 
 if (MSVC)
