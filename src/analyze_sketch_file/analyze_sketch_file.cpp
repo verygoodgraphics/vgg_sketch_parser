@@ -195,7 +195,7 @@ void analyze_sketch_file::analyze(const void* content, const size_t len,
     extract::t_extract_result sketch_file_info;
     extract::set_file(static_cast<const char*>(content), len, sketch_file_info);
 
-    //将图片进行存储
+    //将图片存入输出内存
     do
     {
         // try 

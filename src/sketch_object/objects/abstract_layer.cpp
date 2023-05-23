@@ -63,7 +63,7 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             case 2:
             case 3:
             {
-                ++this->boolean_operation_;
+                //++this->boolean_operation_;
                 break;
             }
 
