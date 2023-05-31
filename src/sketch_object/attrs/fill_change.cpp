@@ -94,7 +94,7 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             range_check(instance["fillType"].get<int>(), 0, 3, "invalid pattern fill type");
 
             instance["imageTileMirrored"] = false;
-            instance["imageTileScale"] = get_json_value(sketch, "patternTileScale", 0.0);
+            instance["imageTileScale"] = get_json_value(sketch, "patternTileScale", 1.0);
 
             auto it_image = sketch.find("image");
             if (it_image == sketch.end())

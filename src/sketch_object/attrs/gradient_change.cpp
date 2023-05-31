@@ -56,7 +56,11 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             case 1:
             {
                 gradient["class"] = string("gradientRadial");
-                gradient["elipseLength"] = sketch.at("elipseLength").get<double>();
+
+                //备注: 该值理论上为 1 时, sketch 原始文件里存的是 0, 就很诡异
+                double value = sketch.at("elipseLength").get<double>();
+                value = value == 0 ? 1 : value;
+                gradient["elipseLength"] = value;
                 break;
             }
 
