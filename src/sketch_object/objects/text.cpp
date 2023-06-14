@@ -148,7 +148,7 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
         vgg["kerning"] = false;
         vgg["horizontalScale"] = 1.0;
         vgg["verticalScale"] = 1.0;
-        vgg["proportionalSpacing"] = 1.0;
+        vgg["proportionalSpacing"] = 0.0;
         vgg["rotate"] = 0.0;
 
         auto &attributes = sketch.at("attributes");

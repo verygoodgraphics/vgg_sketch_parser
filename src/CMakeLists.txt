@@ -9,10 +9,15 @@ file(GLOB_RECURSE all_hpp ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 file(GLOB_RECURSE all_cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${all_h} ${all_hpp} ${all_cpp})
 
+# vgg_sketch_parser relay on vgg_contrib zip boost json
 add_library(vgg_sketch_parser ${all_h} ${all_hpp} ${all_cpp})
 
 get_filename_component(tmp_path ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
-target_include_directories(vgg_sketch_parser PUBLIC ${VGG_CONTRIB_INCLUDE} ${tmp_path})
+target_include_directories(vgg_sketch_parser PUBLIC 
+    ${VGG_CONTRIB_JSON_INCLUDE} 
+    ${VGG_CONTRIB_BOOST_INCLUDE}
+    ${VGG_CONTRIB_ZIP_INCLUDE}
+    ${tmp_path})
 
 target_link_libraries(vgg_sketch_parser PRIVATE zip)
 

@@ -97,7 +97,8 @@ void border_change::change(const nlohmann::json &sketch_border,
     {
         assert(sketch_border_option->at("_class").get<string>() == "borderOptions");
 
-        if (get_json_value(*sketch_border_option, "isEnabled", false))
+        // 备注: 由于 sketch 从旧版过来的值就是 false, 但是却需要对应的效果, 所以都当其为 true 进行处理
+        //if (get_json_value(*sketch_border_option, "isEnabled", false))
         {
             try 
             {
