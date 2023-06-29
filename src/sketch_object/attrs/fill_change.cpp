@@ -32,7 +32,7 @@ SOFTWARE.
 #include "src/basic/get_json_value.hpp"
 #include <fstream>
 
-void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
+void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, double bound_width, double bound_height)
 {
     vgg.clear();
 
@@ -71,7 +71,7 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             it = sketch.find("gradient");
             if (it != sketch.end())
             {
-                gradient_change::change(sketch.at("gradient"), vgg["gradient"]);
+                gradient_change::change(sketch.at("gradient"), vgg["gradient"], bound_width, bound_height);
             }
 
             // 备注: 存在一个用例, 其 isEnabled 为 false, 其 fillType 为渐变, 但 gradient 不存在
@@ -90,11 +90,25 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             auto &instance = pattern["instance"];
             instance["class"] = string("pattern_image");
 
-            instance["fillType"] = get_json_value(sketch, "patternFillType", 0);
-            range_check(instance["fillType"].get<int>(), 0, 3, "invalid pattern fill type");
+            int fill_type = get_json_value(sketch, "patternFillType", 0);
+            instance["fillType"] = fill_type;
+            range_check(fill_type, 0, 3, "invalid pattern fill type");
 
             instance["imageTileMirrored"] = false;
-            instance["imageTileScale"] = get_json_value(sketch, "patternTileScale", 1.0);
+            //instance["imageTileScale"] = get_json_value(sketch, "patternTileScale", 1.0);
+
+            double scale = get_json_value(sketch, "patternTileScale", 1.0);
+            instance["matrix"] = nlohmann::json::array();
+            if (0 != fill_type)
+            {
+                scale = 1;
+            }
+            instance["matrix"].emplace_back(scale);
+            instance["matrix"].emplace_back(0.0);
+            instance["matrix"].emplace_back(0.0);
+            instance["matrix"].emplace_back(scale);
+            instance["matrix"].emplace_back(0.0);
+            instance["matrix"].emplace_back(0.0);            
 
             auto it_image = sketch.find("image");
             if (it_image == sketch.end())

@@ -28,7 +28,7 @@ SOFTWARE.
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/basic/get_json_value.hpp"
 
-void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
+void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, double bound_width, double bound_height)
 {
     vgg.clear();
 
@@ -68,6 +68,13 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             {
                 gradient["class"] = string("gradientAngular");
                 gradient["rotation"] = 0.0;
+                gradient["elipseLength"] = 1;
+                
+                // 手动修改 from 和 to
+                gradient["from"][0] = 0.5;
+                gradient["from"][1] = 0.5;
+                gradient["to"][0] = 0.5;
+                gradient["to"][1] = bound_height >= bound_width ? 1.0 : (bound_width / bound_height);
                 break;
             }
             

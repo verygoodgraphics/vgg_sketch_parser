@@ -27,14 +27,14 @@ SOFTWARE.
 #include "src/sketch_object/attrs/fill_change.h"
 #include "src/sketch_object/attrs/blur_change.h"
 #include "src/sketch_object/attrs/shadow_change.h"
-#include "src/sketch_object/attrs/color_control_change.h"
 #include "src/sketch_object/attrs/context_settings_change.h"
 
-void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlohmann::json &context_setting)
+void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlohmann::json &context_setting,
+    double bound_width, double bound_height)
 {
     vgg.clear();
 
-    auto attr_change = [&sketch, &vgg](decltype(fill_change::change)* fun, const char *sketch_key, const char *vgg_key)
+    auto attr_change = [&sketch, &vgg](decltype(shadow_change::change)* fun, const char *sketch_key, const char *vgg_key)
     {
         auto it = sketch.find(sketch_key);
         if (it == sketch.end())
@@ -63,15 +63,8 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
         assert(sketch.at("_class").get<string>() == "style");
         style_change::get_default(vgg);
 
-        //colorControls 在 sketch-schema 1.0 中是可选的
-        auto it = sketch.find("colorControls");
-        if (it != sketch.end())
-        {
-            color_control_change::change(*it, vgg["colorControls"]);
-        }
-
         //borders
-        it = sketch.find("borders");
+        auto it = sketch.find("borders");
         if (it != sketch.end())
         {
             //borderOptions 在 sketch-schema 1.0 中是可选的
@@ -81,7 +74,7 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
             for (auto &item : *it)
             {
                 nlohmann::json tem;
-                border_change::change(item, border_option, tem);
+                border_change::change(item, border_option, tem, bound_width, bound_height);
                 
                 assert(tem.find("miterLimit") != tem.end());
                 tem["miterLimit"] = sketch.at("miterLimit").get<double>();
@@ -94,7 +87,29 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
         attr_change(blur_change::change, "blur", "blurs");
 
         //fill
-        attr_change(fill_change::change, "fills", "fills");
+        {
+            //attr_change(fill_change::change, "fills", "fills");
+
+            // 脏代码
+            auto it = sketch.find("fills");
+            if (it != sketch.end())
+            {
+                nlohmann::json out;
+                if (it->is_array())
+                {
+                    for (auto &item : *it)
+                    {
+                        fill_change::change(item, out, bound_width, bound_height);
+                        vgg["fills"].emplace_back(std::move(out));
+                    }
+                }
+                else
+                {
+                    fill_change::change(*it, out, bound_width, bound_height);
+                    vgg["fills"].emplace_back(std::move(out));
+                }
+            }
+        }
 
         //shadows 
         attr_change(shadow_change::change, "shadows", "shadows");

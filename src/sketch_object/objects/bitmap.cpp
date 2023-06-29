@@ -25,6 +25,7 @@ SOFTWARE.
 #include "./bitmap.h"
 #include "boost/algorithm/string.hpp"
 #include "src/analyze_sketch_file/analyze_sketch_file.h"
+#include "src/sketch_object/attrs/color_control_change.h"
 
 void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
@@ -54,6 +55,19 @@ void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     {
         assert(false);
         throw sketch_exception("fail to analyze bitmap");
+    }
+
+    //colorControls 在 sketch-schema 1.0 中是可选的
+    try
+    {
+        nlohmann::json image_adjust;
+        image_adjust["class"] = std::string("image_adjust");
+        color_control_change::change(sketch.at("style").at("colorControls"), image_adjust["instance"]);
+
+        vgg["imageAdjust"] = std::move(image_adjust);
+    }
+    catch(...)
+    {
     }
 }
 

@@ -106,7 +106,9 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         }
         else 
         {
-            style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"]);
+            style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"], 
+                vgg["bounds"].at("width").get<double>(), 
+                vgg["bounds"].at("height").get<double>());
         }
 
         /*
@@ -133,6 +135,9 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
         //vgg["isMask"] = static_cast<bool>(this->mask_type_);
         vgg["maskType"] = this->mask_type_;
+
+        vgg["overflow"] = get_json_value(sketch, "presentationStyle", 0) + 1;
+        vgg["style_effect_mask_area"] = 0;
 
         /*
         未处理的项:
@@ -181,6 +186,9 @@ void abstract_layer::create_default_layer(nlohmann::json &vgg)
 
     vgg["class"] = string("layer");
     vgg["childObjects"] = nlohmann::json::array();
+
+    vgg["overflow"] = 1;
+    vgg["style_effect_mask_area"] = 0;
 }
 
 void init_child(t_child &child, int type)

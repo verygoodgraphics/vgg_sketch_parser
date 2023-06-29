@@ -144,7 +144,7 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
         */
 
         //这部分是 sketch 没有对应的属性, 采用默认值
-        context_settings_change::get_default(vgg["contextSettings"]);
+        //context_settings_change::get_default(vgg["contextSettings"]);
         vgg["kerning"] = false;
         vgg["horizontalScale"] = 1.0;
         vgg["verticalScale"] = 1.0;
@@ -167,13 +167,25 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
         text::font_descriptor_change(attributes.at("MSAttributedStringFontAttribute"), vgg);
 
         it = attributes.find("MSAttributedStringColorAttribute");
-        if (it != attributes.end())
         {
-            color_change::change(*it, vgg["fillColor"]);
-        }
-        else
-        {
-            color_change::get_default(vgg["fillColor"]);
+            nlohmann::json color;
+            if (it != attributes.end())
+            {
+                color_change::change(*it, color);
+            }
+            else
+            {
+                color_change::get_default(color);
+            }
+
+            //脏代码
+            nlohmann::json fill;
+            fill["class"] = "fill";
+            fill["isEnabled"] = true;
+            fill["fillType"] = 0;
+            fill["color"] = std::move(color);
+            context_settings_change::get_default(fill["contextSettings"]);
+            vgg["fills"].emplace_back(std::move(fill));
         }
 
         nlohmann::json null_json;

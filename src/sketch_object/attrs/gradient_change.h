@@ -35,12 +35,15 @@ public:
      * 
      * @param sketch sketch 的输入
      * @param vgg 符合 vgg-format 的输出
+     * @param bound_width bound 的 宽度
+     * @param bound_height bound 的 高度
      * 
      * @exception sketch_exception
      * 
      * @note 会对 vgg 先进行 clear
     */
-    static void change(const nlohmann::json &sketch, nlohmann::json &vgg);
+    static void change(const nlohmann::json &sketch, nlohmann::json &vgg,
+        double bound_width, double bound_height);
 
 private:
     /**
