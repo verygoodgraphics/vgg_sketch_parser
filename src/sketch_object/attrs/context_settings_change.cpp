@@ -34,8 +34,14 @@ void context_settings_change::change(const nlohmann::json &sketch, nlohmann::jso
 
     vgg["class"] = string("graphicsContextSettings");
 
-    vgg["blendMode"] = get_json_value(sketch, "blendMode", 0);
-    range_check(vgg["blendMode"].get<int>(), 0, 17, "invalid blend mode");
+    // 备注: 存在该值为 1000 的情况
+    int blend_mode = get_json_value(sketch, "blendMode", 0);
+    vgg["blendMode"] = blend_mode;
+    if (blend_mode > 17 || blend_mode < 0)
+    {
+        vgg["blendMode"] = 0;
+    }
+    //range_check(vgg["blendMode"].get<int>(), 0, 17, "invalid blend mode");
 
     vgg["opacity"] = get_json_value(sketch, "opacity", 0.0);
     range_check(vgg["opacity"].get<double>(), 0.0, 1.0, "invalid opacity");
