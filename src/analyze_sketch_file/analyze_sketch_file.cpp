@@ -28,7 +28,9 @@ SOFTWARE.
 #include "src/sketch_object/objects/page.h"
 #include "boost/algorithm/string.hpp"
 #include "src/sketch_object/mask.h"
+#include "src/sketch_object/check.hpp"
 
+check check::ins_;
 const char* analyze_sketch_file::_image_dir_name = "image";
 // optional<valijson::Schema> analyze_sketch_file::_document_schema;
 // optional<valijson::Schema> analyze_sketch_file::_meta_schema;
@@ -187,11 +189,12 @@ void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file
     }
 }
 
-void analyze_sketch_file::analyze(const void* content, const size_t len,
+bool analyze_sketch_file::analyze(const void* content, const size_t len,
     const char* name, nlohmann::json &json_out, map<string, vector<char>> &out_file)
 {
     //analyze_sketch_file::init();
-
+    
+    check::ins_.reset();
     extract::t_extract_result sketch_file_info;
     extract::set_file(static_cast<const char*>(content), len, sketch_file_info);
 
@@ -237,10 +240,12 @@ void analyze_sketch_file::analyze(const void* content, const size_t len,
     if (sketch_file_info.empty())
     {
         assert(false);
-        return;
+        return true;
     }
 
     vector<string> vec_page_file_path;
     analyze_sketch_file::deal_meta(sketch_file_info, vec_page_file_path);
     analyze_sketch_file::deal_page(sketch_file_info, vec_page_file_path, json_out);
+
+    return check::ins_.get_error().empty();
 }

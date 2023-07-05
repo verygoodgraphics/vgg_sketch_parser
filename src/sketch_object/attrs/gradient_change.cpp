@@ -39,9 +39,48 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, 
         vgg["class"] = string("gradient");
 
         auto &gradient = vgg["instance"];
-        point_string_change::change(sketch.at("from"), gradient["from"]);
-        point_string_change::change(sketch.at("to"), gradient["to"]);
-        gradient_change::gradient_stops_change(sketch.at("stops"), gradient["stops"]);
+
+        //脏代码        
+        try
+        {
+            point_string_change::change(sketch.at("from"), gradient["from"]);
+        }
+        catch(...)
+        {
+            gradient["from"].emplace_back(0.0);
+            gradient["from"].emplace_back(0.0);
+
+            // 备注: 碰到过 gradient isEnable 为 false 时, 缺少 from 的情况
+            // check::ins_.add_error("failed to get gradient.from");
+        }
+        try 
+        {
+            point_string_change::change(sketch.at("to"), gradient["to"]);
+        }
+        catch(...)
+        {
+            gradient["to"].emplace_back(1.0);
+            gradient["to"].emplace_back(1.0);
+            check::ins_.add_error("failed to get gradient.to");            
+        }
+
+        auto it = sketch.find("stops");
+        if (it != sketch.end())
+        {
+            gradient_change::gradient_stops_change(sketch.at("stops"), gradient["stops"]);
+        }
+        else
+        {
+            nlohmann::json stop_0;
+            nlohmann::json stop_1;
+            gradient_change::create_default_stops(stop_0);
+            gradient_change::create_default_stops(stop_1);
+            gradient["stops"] = nlohmann::json::array();
+            gradient["stops"].emplace_back(std::move(stop_0));
+            gradient["stops"].emplace_back(std::move(stop_1));
+            check::ins_.add_error("failed to get gradient.stops");
+        }
+        
         gradient["invert"] = false;
 
         int type = get_json_value(sketch, "gradientType", 0);
@@ -58,23 +97,23 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, 
                 gradient["class"] = string("gradientRadial");
 
                 //备注: 该值理论上为 1 时, sketch 原始文件里存的是 0, 就很诡异
-                double value = sketch.at("elipseLength").get<double>();
-                value = value == 0 ? 1 : value;
-                gradient["elipseLength"] = value;
+                double elipse_length = get_json_value(sketch, "elipseLength", 1.0);
+                elipse_length = elipse_length == 0 ? 1 : elipse_length;
+                gradient["elipseLength"] = elipse_length;
                 break;
             }
 
             case 2:
             {
                 gradient["class"] = string("gradientAngular");
-                gradient["rotation"] = 0.0;
+                // gradient["rotation"] = 0.0;
                 gradient["elipseLength"] = 1;
                 
                 // 手动修改 from 和 to
                 gradient["from"][0] = 0.5;
                 gradient["from"][1] = 0.5;
-                gradient["to"][0] = 0.5;
-                gradient["to"][1] = bound_height >= bound_width ? 1.0 : (bound_width / bound_height);
+                gradient["to"][0] = bound_width >= bound_height ? 1.0 : (bound_height / bound_width);
+                gradient["to"][1] = 0.5;
                 break;
             }
             
@@ -107,8 +146,9 @@ void gradient_change::gradient_stops_change(const nlohmann::json &sketch, nlohma
         tem["class"] = std::string("gradientStop");
         tem["midPoint"] = 0.5;
 
-        tem["position"] = get_json_value(item, "position", 0.0);
-        range_check(tem["position"].get<double>(), 0.0, 1.0, "invalid gradient stop position");
+        double position = get_json_value(item, "position", 0.0);
+        check::ins_.check_range(position, 0.0, 1.0, 0.0, "invalid gradient stop position");
+        tem["position"] = position;
 
         try 
         {
@@ -121,4 +161,13 @@ void gradient_change::gradient_stops_change(const nlohmann::json &sketch, nlohma
 
         vgg.emplace_back(std::move(tem));
     }
+}
+
+void gradient_change::create_default_stops(nlohmann::json &out)
+{
+    out.clear();
+    out["class"] = "gradientStop";
+    color_change::get_default(out["color"]);
+    out["position"] = 0.0;
+    out["midPoint"] = 0.5;
 }

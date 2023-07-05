@@ -44,8 +44,12 @@ public:
      * @param out_file 输出的文件, 比如图像 <文件名(utf-8), 文件内容>
      * 
      * @exception sketch_exception
+     * 
+     * @return
+     *      true: 解析正常, 所有的数据组织方式均在意料之中
+     *      false: 勉强解析, 存在预料之外的数据组织方式
     */
-    static void analyze
+    static bool analyze
     (
         const void* content, 
         const size_t len,

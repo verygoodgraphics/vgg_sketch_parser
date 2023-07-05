@@ -57,6 +57,9 @@ private:
      * @note 会对 vgg 先进行 clear
     */
     static void gradient_stops_change(const nlohmann::json &sketch, nlohmann::json &vgg);
+
+    // 创建默认的 stops
+    static void create_default_stops(nlohmann::json &out);
 };
 
 #endif

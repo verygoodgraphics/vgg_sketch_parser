@@ -42,19 +42,14 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, doub
 
         vgg["class"] = "fill";
         vgg["isEnabled"] = get_json_value(sketch, "isEnabled", false);
-        
-        //备注: 确保 color 的存在性, 当 fillType 不在预期内时, 强制使用 color
-        try 
+
+        int fill_type = border_change::fill_type_change(get_json_value(sketch, "fillType", 0));
+
+        auto it_color = sketch.find("color");
+        if (it_color != sketch.end())
         {
             color_change::change(sketch.at("color"), vgg["color"]);
-        }       
-        catch(...)
-        {
-            color_change::get_default(vgg["color"]);
         }
-
-        int fill_type = border_change::fill_type_change(sketch.at("fillType"));
-        vgg["fillType"] = fill_type;
 
         //备注: 在 sketch-schema 1.0 中, contextSettings 和 gradient 是可选的
         {
@@ -73,26 +68,27 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, doub
             {
                 gradient_change::change(sketch.at("gradient"), vgg["gradient"], bound_width, bound_height);
             }
-
-            // 备注: 存在一个用例, 其 isEnabled 为 false, 其 fillType 为渐变, 但 gradient 不存在
-            // else if (1 == fill_type) 
-            // {
-            //     throw sketch_exception("fill type is gradient, but gradient is not exists");
-            // }
+            else if (1 == fill_type) 
+            {
+                // 备注: 存在一个用例, 其 isEnabled 为 false, 其 fillType 为渐变, 但 gradient 不存在, 此时将其修改为纯色
+                // 脏代码: 更好的策略是构造一个默认的 gradient
+                // check::ins_.add_error("failed to create fill.gradient");
+                fill_type = 0;
+            }
         }
 
         //pattern
-        if (vgg["fillType"].get<int>() == 2)
+        if (fill_type == 2)
         {
-            auto &pattern = vgg["pattern"];
+            nlohmann::json pattern;
             pattern["class"] = "pattern";
             
             auto &instance = pattern["instance"];
             instance["class"] = string("pattern_image");
 
-            int fill_type = get_json_value(sketch, "patternFillType", 0);
-            instance["fillType"] = fill_type;
-            range_check(fill_type, 0, 3, "invalid pattern fill type");
+            int pattern_fill_type = get_json_value(sketch, "patternFillType", 0);
+            check::ins_.check_range(pattern_fill_type, 0, 3, 0, "invalid pattern fill type");
+            instance["fillType"] = pattern_fill_type;
 
             instance["imageTileMirrored"] = false;
             //instance["imageTileScale"] = get_json_value(sketch, "patternTileScale", 1.0);
@@ -115,13 +111,42 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, doub
             {
                 //szn_todo
                 //备注: image 在 sketch 中不是必选项, 但目前的处理方式下, 其是必须的
-                throw sketch_exception("although image is not required in sketch, it is currently required in vgg-sketch-parser");
-            }
+                //throw sketch_exception("although image is not required in sketch, it is currently required in vgg-sketch-parser");
 
-            string file_name;
-            bitmap::get_image_file_name(*it_image, file_name);
-            instance["imageFileName"] = file_name;
+                // 备注: 解析不了, 则先用纯色, 比抛异常好
+                // 备注: 目前遇到过 pattern 使用 noiseIndex 的, 这些是目前解析不了的 szn_todo
+                fill_type = 0;
+                //check::ins_.add_error("failed to create fill.pattern");
+            }
+            else 
+            {
+                string file_name;
+                
+                try
+                {
+                    bitmap::get_image_file_name(*it_image, file_name);
+                }
+                catch (sketch_exception &e) 
+                {
+                    check::ins_.add_error(e.get());
+                    file_name = "image not found";
+                }
+                catch (...)
+                {
+                    check::ins_.add_error("fail to analyze bitmap");
+                    file_name = "image not found"; 
+                }
+
+                instance["imageFileName"] = file_name;
+                vgg["pattern"] = std::move(pattern);
+            }
         }
+
+        if (!fill_type && vgg.find("color") == vgg.end())
+        {
+            color_change::get_default(vgg["color"]);
+        }
+        vgg["fillType"] = fill_type;
 
         /*
         备注: 未处理的项包括

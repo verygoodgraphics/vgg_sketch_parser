@@ -32,10 +32,12 @@ void blur_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     vgg.clear();
 
     assert(sketch.at("_class").get<string>() == "blur");
-
     vgg["class"] = string("blur");
-    vgg["type"] = get_json_value(sketch, "type", 0);
-    range_check(vgg["type"].get<int>(), 0, 3, "invalid blur type");
+
+    int type = get_json_value(sketch, "type", 0);
+    check::ins_.check_range(type, 0, 3, 0, "invalid blur type");
+    vgg["type"] = type;
+
     vgg["isEnabled"] = get_json_value(sketch, "isEnabled", false);
     vgg["radius"] = get_json_value(sketch, "radius", 0.0);
     vgg["motionAngle"] = get_json_value(sketch, "motionAngle", 0.0);

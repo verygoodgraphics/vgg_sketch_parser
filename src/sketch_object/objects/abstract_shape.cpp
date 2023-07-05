@@ -38,8 +38,17 @@ void abstract_shape::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         nlohmann::json contour;
         contour["class"] = "contour";
         contour["closed"] = get_json_value(sketch, "isClosed", false);
-        abstract_shape::curve_point_change(sketch.at("points"), sketch.at("frame"), contour["points"]);
 
+        try
+        {
+            abstract_shape::curve_point_change(sketch.at("points"), sketch.at("frame"), contour["points"]);
+        }
+        catch(...)
+        {
+            contour["points"] = nlohmann::json::array();
+            check::ins_.add_error("failed to change points");
+        }
+        
         nlohmann::json sub_shape;
         sub_shape["class"] = string("subshape");
         sub_shape["subGeometry"] = std::move(contour);
@@ -49,15 +58,16 @@ void abstract_shape::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         shape["class"] = string("shape");
         shape["subshapes"].emplace_back(std::move(sub_shape));
         
+        int winding_rule = 1;
         try 
         {
-            shape["windingRule"] = sketch.at("style").at("windingRule");
+            winding_rule = sketch.at("style").at("windingRule").get<int>();
         }
         catch(...)
         {
-            shape["windingRule"] = 1;
         }
-        range_check(shape["windingRule"].get<int>(), 0, 1, "invalid winding rule");
+        check::ins_.check_range(winding_rule, 0, 1, 1, "invalid winding rule");
+        shape["windingRule"] = winding_rule;
 
         vgg["shape"] = std::move(shape);
     
@@ -124,8 +134,9 @@ void abstract_shape::curve_point_change(const nlohmann::json &sketch_points,
             auto it = item.find("cornerStyle");
             if (it != item.end())
             {
-                point["cornerStyle"] = *it;
-                range_check(point["cornerStyle"].get<int>(), 0, 3, "invalid corner style");
+                int corner_style = it->get<int>();
+                check::ins_.check_range(corner_style, 0, 3, 0, "invalid corner style");
+                point["cornerStyle"] = corner_style;
             }
 
             if (get_json_value(item, "hasCurveFrom", false))

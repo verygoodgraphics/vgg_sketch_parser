@@ -28,6 +28,7 @@ SOFTWARE.
 #include "src/sketch_object/attrs/blur_change.h"
 #include "src/sketch_object/attrs/shadow_change.h"
 #include "src/sketch_object/attrs/context_settings_change.h"
+#include "src/basic/get_json_value.hpp"
 
 void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlohmann::json &context_setting,
     double bound_width, double bound_height)
@@ -77,7 +78,10 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
                 border_change::change(item, border_option, tem, bound_width, bound_height);
                 
                 assert(tem.find("miterLimit") != tem.end());
-                tem["miterLimit"] = sketch.at("miterLimit").get<double>();
+                if (sketch.find("miterLimit") != sketch.end())
+                {
+                    tem["miterLimit"] = sketch.at("miterLimit").get<double>();
+                }
 
                 vgg["borders"].emplace_back(std::move(tem));
             }

@@ -34,17 +34,18 @@ void context_settings_change::change(const nlohmann::json &sketch, nlohmann::jso
 
     vgg["class"] = string("graphicsContextSettings");
 
-    // 备注: 存在该值为 1000 的情况
     int blend_mode = get_json_value(sketch, "blendMode", 0);
-    vgg["blendMode"] = blend_mode;
-    if (blend_mode > 17 || blend_mode < 0)
+    if (blend_mode == 1000)
     {
-        vgg["blendMode"] = 0;
+        // 备注: 存在该值为 1000 的情况
+        blend_mode = 0;
     }
-    //range_check(vgg["blendMode"].get<int>(), 0, 17, "invalid blend mode");
+    check::ins_.check_range(blend_mode, 0, 17, 0, "invalid blend mode");
+    vgg["blendMode"] = blend_mode;
 
-    vgg["opacity"] = get_json_value(sketch, "opacity", 0.0);
-    range_check(vgg["opacity"].get<double>(), 0.0, 1.0, "invalid opacity");
+    double opacity = get_json_value(sketch, "opacity", 0.0);
+    check::ins_.check_range(opacity, 0.0, 1.0, 1.0, "invalid opacity");
+    vgg["opacity"] = opacity;
 
     vgg["isolateBlending"] = false;
     vgg["transparencyKnockoutGroup"] = 0;

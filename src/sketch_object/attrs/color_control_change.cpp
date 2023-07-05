@@ -30,18 +30,18 @@ void color_control_change::change(const nlohmann::json &sketch, nlohmann::json &
 {
     vgg.clear();
 
-    assert(sketch.at("_class").get<string>() == "colorControls");
-
-    vgg["brightness"] = get_json_value(sketch, "brightness", 0.0);
-    vgg["contrast"] = get_json_value(sketch, "contrast", 0.0);
-    vgg["hue"] = get_json_value(sketch, "hue", 0.0);
-    vgg["saturation"] = get_json_value(sketch, "saturation", 0.0);
-
-    for (auto &item : vgg)
+    auto get = [](const nlohmann::json &sketch, const char* key, double default_value)
     {
-        range_check(item.get<double>(), -100.0, 100.0, "invalid color control");
-    }
+        double value = get_json_value(sketch, key, default_value);
+        check::ins_.check_range(value, -100.0, 100.0, 0.0, "invalid color control");
+        return value;
+    };
 
+    assert(sketch.at("_class").get<string>() == "colorControls");
     vgg["class"] = string("colorControls");
     vgg["isEnabled"] = get_json_value(sketch, "isEnabled", false);
+    vgg["brightness"] = get(sketch, "brightness", 0.0);
+    vgg["contrast"] = get(sketch, "contrast", 0.0);
+    vgg["hue"] = get(sketch, "hue", 0.0);
+    vgg["saturation"] = get(sketch, "saturation", 0.0);
 }

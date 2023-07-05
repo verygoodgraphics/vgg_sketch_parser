@@ -25,6 +25,7 @@ SOFTWARE.
 #include "./symbol_master.h"
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/sketch_object/mask.h"
+#include "src/sketch_object/check.hpp"
 #include <regex>
 #include <algorithm>
 #include <array>
@@ -56,7 +57,9 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         }
         else if (vgg["hasBackgroundColor"].get<bool>())
         {
-            throw sketch_exception("fail to get symbol master background color");
+            //throw sketch_exception("fail to get symbol master background color");
+            color_change::get_default(vgg["backgroundColor"]);
+            check::ins_.add_error("failed to get symbol-master.backgroundColor");
         }
 
         vgg["includeBackgroundColorInInstance"] = get_json_value(sketch, "includeBackgroundColorInInstance", true);
@@ -67,7 +70,18 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         it = sketch.find("overrideProperties");
         if (it != sketch.end())
         {
-            symbol_master::override_properties_change(*it, vgg["overrideProperties"]);
+            try 
+            {
+                symbol_master::override_properties_change(*it, vgg["overrideProperties"]);
+            }
+            catch(sketch_exception &e)
+            {
+                check::ins_.add_error(e.get());
+            }
+            catch(...)
+            {
+                check::ins_.add_error("failed to change symbol-master.overrideProperties");
+            }
         }
         
         vgg["childObjects"] = nlohmann::json::array();

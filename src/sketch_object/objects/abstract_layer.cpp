@@ -69,7 +69,9 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
             default:
             {
-                throw sketch_exception("invalid boolean operator");
+                //throw sketch_exception("invalid boolean operator");
+                this->boolean_operation_ = 4;
+                check::ins_.add_error("invalid boolean operator");
             }
         }
 

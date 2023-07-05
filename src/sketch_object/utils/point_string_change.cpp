@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "./point_string_change.h"
+#include "src/sketch_object/check.hpp"
 #include <regex>
 
 void point_string_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
@@ -56,7 +57,10 @@ void point_string_change::change(const nlohmann::json &sketch, double *out)
     }
     catch(...)
     {
-        throw sketch_exception("fail to analyze point string");
+        //throw sketch_exception("fail to analyze point string");
+        out[0] = 1.0;
+        out[1] = 1.0;
+        check::ins_.add_error("fail to analyze point string");
     }
 }
 

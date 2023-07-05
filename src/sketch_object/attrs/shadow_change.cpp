@@ -26,6 +26,7 @@ SOFTWARE.
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/sketch_object/attrs/context_settings_change.h"
 #include "src/basic/get_json_value.hpp"
+#include "src/sketch_object/check.hpp"
 
 void shadow_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
@@ -44,6 +45,7 @@ void shadow_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     catch(...)
     {
         color_change::get_default(vgg["color"]);
+        check::ins_.add_error("failed to get shadow.color");
     }
     
     vgg["offsetX"] = get_json_value(sketch, "offsetX", 0.0); 
@@ -58,6 +60,7 @@ void shadow_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     catch(...)
     {
         context_settings_change::get_default(vgg["contextSettings"]);
+        check::ins_.add_error("failed to get shadow.contextSettings");
     }
 
     vgg["inner"] = sketch.at("_class").get<string>() != "shadow";

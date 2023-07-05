@@ -35,6 +35,8 @@ void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     try
     {
         vgg["class"] = string("text");
+
+        //备注: 当前要求 attributedString 必须存在
         text::attributed_string_change(sketch.at("attributedString"), vgg);
         
         if (get_json_value(sketch, "automaticallyDrawOnUnderlyingPath", false))
@@ -62,7 +64,9 @@ void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             }
             default:
             {
-                throw sketch_exception("invalid text behaviour");
+                // throw sketch_exception("invalid text behaviour");
+                text_behavious = 0;
+                check::ins_.add_error("invalid text behaviour");
             }
         }
         vgg["frameMode"] = text_behavious;
@@ -93,25 +97,47 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
 
     try
     {
-        vgg["content"] = sketch.at("string").get<string>();
+        auto it = sketch.find("string");
+        if (it != sketch.end())
+        {
+            vgg["content"] = sketch.at("string").get<string>();
+        }
+        else 
+        {
+            vgg["content"] = string("");
+            check::ins_.add_error("failed to get text.context");
+        }
         
         //确保有序
+        vgg["attr"] = nlohmann::json::array();
         vector<const nlohmann::json*> order_attributes;
-        for (auto &item : sketch.at("attributes"))
+        it = sketch.find("attributes");
+        if (it != sketch.end())
         {
-            order_attributes.emplace_back(&item);
-        }
-        std::sort(order_attributes.begin(), order_attributes.end(), 
-            [](const nlohmann::json *item_0, const nlohmann::json *item_1)
-        {
-            return item_0->at("location").get<int>() < item_1->at("location").get<int>();
-        });
+            for (auto &item : *it)
+            {
+                order_attributes.emplace_back(&item);
+            }
 
-        for (auto &item : order_attributes)
-        {
-            nlohmann::json vgg_font_attr;            
-            string_attribute_change(*item, vgg_font_attr);
-            vgg["attr"].emplace_back(std::move(vgg_font_attr));
+            try 
+            {
+                std::sort(order_attributes.begin(), order_attributes.end(), 
+                    [](const nlohmann::json *item_0, const nlohmann::json *item_1)
+                {
+                    return item_0->at("location").get<int>() < item_1->at("location").get<int>();
+                });                    
+            }
+            catch(...)
+            {
+                check::ins_.add_error("failed to sort text.attr");
+            }
+
+            for (auto &item : order_attributes)
+            {
+                nlohmann::json vgg_font_attr;            
+                string_attribute_change(*item, vgg_font_attr);
+                vgg["attr"].emplace_back(std::move(vgg_font_attr));
+            }
         }
     }
     catch(sketch_exception &e)
@@ -132,7 +158,17 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
     try
     {
         vgg["class"] = string("fontAttr");
-        vgg["length"] = sketch.at("length").get<int>();
+
+        auto it_length = sketch.find("length");
+        if (it_length != sketch.end())
+        {
+            vgg["length"] = sketch.at("length").get<int>();
+        }
+        else 
+        {
+            vgg["length"] = 1;
+            check::ins_.add_error("failed to get text.attr.length");
+        }
         assert(vgg["length"].get<int>());
 
         /*
@@ -151,6 +187,7 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
         vgg["proportionalSpacing"] = 0.0;
         vgg["rotate"] = 0.0;
 
+        // 备注: attributes 用到的地方太多了, 先强制其存在, 不行的话后续改
         auto &attributes = sketch.at("attributes");
         auto it = attributes.find("kerning");
         if (it != attributes.end())
@@ -164,7 +201,17 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
 
         //备注: textStyleVerticalAlignmentKey 不用, 用 style.textStyle.verticalAlignment
 
-        text::font_descriptor_change(attributes.at("MSAttributedStringFontAttribute"), vgg);
+        try 
+        {
+            text::font_descriptor_change(attributes.at("MSAttributedStringFontAttribute"), vgg);
+        }
+        catch(...)
+        {
+            //脏代码
+            // vgg["name"] = "";
+            vgg["size"] = 1.0;
+            check::ins_.add_error("failed to get text.font-descriptor");
+        }
 
         it = attributes.find("MSAttributedStringColorAttribute");
         {
@@ -197,8 +244,9 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
             it = attributes.find("underlineStyle");
             if (it != attributes.end())
             {
-                vgg["underline"] = it->get<int>();
-                range_check(vgg["underline"].get<int>(), 0, 1, "invalid underline");
+                int underline = it->get<int>();
+                check::ins_.check_range(underline, 0, 1, 0, "invalid underline");
+                vgg["underline"] = underline;
             }
             else 
             {
@@ -208,8 +256,9 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
             it = attributes.find("strikethroughStyle");
             if (it != attributes.end())
             {
-                vgg["linethrough"] = static_cast<bool>(it->get<int>());
-                range_check(it->get<int>(), 0, 1, "invalid linethrough");
+                int linethrough = it->get<int>();
+                check::ins_.check_range(linethrough, 0, 1, 0, "invalid linethrough");
+                vgg["linethrough"] = static_cast<bool>(linethrough);
             }
             else 
             {
@@ -234,7 +283,9 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
                 }
                 else 
                 {
-                    throw sketch_exception("invalid letter transform");
+                    //throw sketch_exception("invalid letter transform");
+                    check::ins_.add_error("invalid letter transform");
+                    vgg["lettertransform"] = 0;
                 }
             }
             else 
@@ -335,8 +386,9 @@ void text::paragraph_style_change(const nlohmann::json &sketch, nlohmann::json &
         it = sketch.find("alignment");
         if (it != sketch.end())
         {
-            vgg["horizontalAlignment"] = it->get<int>();
-            range_check(vgg["horizontalAlignment"].get<int>(), 0, 4, "invalid horizontal alignment");
+            int horizontal_alignment = it->get<int>();
+            check::ins_.check_range(horizontal_alignment, 0, 4, 0, "invalid horizontal alignment");
+            vgg["horizontalAlignment"] = horizontal_alignment;
         }
 
         // 经测试, sketch 中 调整行距会使得 maximumLineHeight minimumLineHeight 为同一值
@@ -371,8 +423,9 @@ void text::text_style_change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
     try 
     {
-        vgg["verticalAlignment"] = sketch.at("style").at("textStyle").at("verticalAlignment");
-        range_check(vgg["verticalAlignment"].get<int>(), 0, 2, "invalid vertical alignment");
+        int vertical_alignment = sketch.at("style").at("textStyle").at("verticalAlignment").get<int>();
+        check::ins_.check_range(vertical_alignment, 0, 2, 0, "invalid vertical alignment");
+        vgg["verticalAlignment"] = vertical_alignment;
     }
     catch(...)
     {

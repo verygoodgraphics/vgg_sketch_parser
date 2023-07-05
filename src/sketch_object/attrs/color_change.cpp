@@ -32,16 +32,18 @@ void color_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
     assert(sketch.at("_class").get<string>() == "color");
 
-    vgg["alpha"] = get_json_value(sketch, "alpha", 1.0);
-    vgg["red"] = get_json_value(sketch, "red", 0.0);
-    vgg["green"] = get_json_value(sketch, "green", 0.0);
-    vgg["blue"] = get_json_value(sketch, "blue", 0.0);
-    for (auto &item : vgg)
+    auto get = [](const nlohmann::json &sketch, const char *key, double default_value)
     {
-        range_check(item.get<double>(), 0.0, 1.0, "color value invalid range");
-    }
-
+        double value = get_json_value(sketch, key, 1.0);
+        check::ins_.check_range(value, 0.0, 1.0, default_value, "color value invalid range");
+        return value;
+    };
+    
     vgg["class"] = "color";
+    vgg["alpha"] = get(sketch, "alpha", 1.0);
+    vgg["red"] = get(sketch, "red", 0.0);
+    vgg["green"] = get(sketch, "green", 0.0);
+    vgg["blue"] = get(sketch, "blue", 0.0);
 
     //备注: sketch 中的 swatchID 没有处理
 }

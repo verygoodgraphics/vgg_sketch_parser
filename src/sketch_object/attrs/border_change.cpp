@@ -35,27 +35,22 @@ void border_change::change(const nlohmann::json &sketch_border,
 {
     vgg.clear();
 
-
     assert(sketch_border.at("_class").get<string>() == "border");
 
     vgg["class"] = "border";
     vgg["isEnabled"] = get_json_value(sketch_border, "isEnabled", false);
 
-    //备注: 确保 color 的存在性, 当 fillType 不在预期内时, 强制使用 color
-    try 
+    auto fill_type = border_change::fill_type_change(get_json_value(sketch_border, "fillType", 0));
+
+    auto it_color = sketch_border.find("color");
+    if (it_color != sketch_border.end())
     {
         color_change::change(sketch_border.at("color"), vgg["color"]);
-    }       
-    catch(...)
-    {
-        color_change::get_default(vgg["color"]);
     }
 
-    auto fill_type = border_change::fill_type_change(sketch_border.at("fillType").get<int>());
-    vgg["fillType"] = fill_type;
-
-    vgg["position"] = get_json_value(sketch_border, "position", 0);
-    range_check(vgg["position"].get<int>(), 0, 2, "invalid border position");
+    int position = get_json_value(sketch_border, "position", 0);
+    check::ins_.check_range(position, 0, 2, 0, "invalid border position");
+    vgg["position"] = position;
 
     vgg["thickness"] = get_json_value(sketch_border, "thickness", 1);
 
@@ -76,13 +71,21 @@ void border_change::change(const nlohmann::json &sketch_border,
         {
             gradient_change::change(sketch_border.at("gradient"), vgg["gradient"], bound_width, bound_height);
         }
-
-        // 备注: 存在一个用例, 其 isEnabled 为 false, 其 fillType 为渐变, 但 gradient 不存在
-        // else if (1 == fill_type) 
-        // {
-        //     throw sketch_exception("fill type is gradient, but gradient is not exists");
-        // }
+        else if (1 == fill_type) 
+        {
+            // 备注: 存在一个用例, 其 isEnabled 为 false, 其 fillType 为渐变, 但 gradient 不存在, 此时将其修改为纯色
+            // 脏代码: 更好的策略是构造一个默认的 gradient
+            // check::ins_.add_error("failed to create border.gradient");
+            fill_type = 0;
+        }
     }
+
+    //备注: 确保 color 的存在性, 当 fillType 不在预期内时, 强制使用 color
+    if (!fill_type && vgg.find("color") == vgg.end())
+    {
+        color_change::get_default(vgg["color"]);
+    }
+    vgg["fillType"] = fill_type;
 
     vgg["style"] = 0;
     vgg["dashedPattern"] = nlohmann::json::array();
@@ -116,11 +119,13 @@ void border_change::change(const nlohmann::json &sketch_border,
             {
             }
 
-            vgg["lineCapStyle"] = get_json_value(*sketch_border_option, "lineCapStyle", 0);
-            range_check(vgg["lineCapStyle"].get<int>(), 0, 2, "invalid line cap");
-
-            vgg["lineJoinStyle"] = get_json_value(*sketch_border_option, "lineJoinStyle", 0);
-            range_check(vgg["lineJoinStyle"].get<int>(), 0, 2, "invalid line join");
+            int line_cap = get_json_value(*sketch_border_option, "lineCapStyle", 0);
+            check::ins_.check_range(line_cap, 0, 2, 0, "invalid line cap");
+            vgg["lineCapStyle"] = line_cap;
+            
+            int line_join = get_json_value(*sketch_border_option, "lineJoinStyle", 0);
+            check::ins_.check_range(line_join, 0, 2, 0, "invalid line join");
+            vgg["lineJoinStyle"] = line_join;
         }
     }
 }
@@ -131,13 +136,15 @@ int border_change::fill_type_change(int sketch_fill_type)
     {
         return sketch_fill_type;
     }
-    else if (4 == sketch_fill_type)
+    else if (4 == sketch_fill_type || 5 == sketch_fill_type)
     {
+        // 备注: 有遇到过该值为5, 实际为 pattern 模式填充的情况
         return 2;
     }
 
     //assert(false);
     //throw sketch_exception("invalid fill type");
     //return -1;
+    check::ins_.add_error("invalid fill type");
     return 0;
 }

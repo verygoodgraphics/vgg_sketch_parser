@@ -26,6 +26,7 @@ SOFTWARE.
 #include "boost/algorithm/string.hpp"
 #include "src/analyze_sketch_file/analyze_sketch_file.h"
 #include "src/sketch_object/attrs/color_control_change.h"
+#include "src/sketch_object/check.hpp"
 
 void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
@@ -49,12 +50,17 @@ void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     }
     catch(sketch_exception &e)
     {
-        throw e;
+        //throw e;
+        check::ins_.add_error(e.get());
+        vgg["imageFileName"] = string("image not found");
     }
     catch(...)
     {
-        assert(false);
-        throw sketch_exception("fail to analyze bitmap");
+        //assert(false);
+        //throw sketch_exception("fail to analyze bitmap");
+
+        check::ins_.add_error("fail to analyze bitmap");
+        vgg["imageFileName"] = string("image not found"); 
     }
 
     //colorControls 在 sketch-schema 1.0 中是可选的

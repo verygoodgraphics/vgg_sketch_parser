@@ -26,6 +26,7 @@ SOFTWARE.
 #include "./symbol_master.h"
 #include "src/sketch_object/attrs/file_ref_change.h"
 #include "src/sketch_object/attrs/data_ref_change.h"
+#include "src/sketch_object/check.hpp"
 
 void symbol_instance::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
@@ -35,12 +36,23 @@ void symbol_instance::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     try 
     {
         vgg["class"] = string("symbolInstance");
-
+        
         vgg["overrideValues"] = nlohmann::json::array();
-        auto it = sketch.find("overrideValues");
-        if (it != sketch.end())
+        try 
         {
-            symbol_instance::override_values_change(*it, vgg["overrideValues"]);
+            auto it = sketch.find("overrideValues");
+            if (it != sketch.end())
+            {
+                symbol_instance::override_values_change(*it, vgg["overrideValues"]);
+            }
+        }
+        catch(sketch_exception &e)
+        {
+            check::ins_.add_error(e.get());
+        }
+        catch(...)
+        {
+            check::ins_.add_error("failed to get symbol-instance.overrideValues");
         }
 
         vgg["symbolID"] = sketch.at("symbolID").get<string>();

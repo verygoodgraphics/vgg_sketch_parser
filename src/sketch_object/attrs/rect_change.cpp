@@ -25,6 +25,7 @@ SOFTWARE.
 #include "./rect_change.h"
 #include "src/basic/rect.h"
 #include "src/basic/get_json_value.hpp"
+#include "src/sketch_object/check.hpp"
 
 namespace ublas = boost::numeric::ublas;
 
@@ -45,7 +46,16 @@ void rect_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     }
     catch (...)
     {
-        throw sketch_exception("analyze sketch rect fail");
+        // throw sketch_exception("analyze sketch rect fail");
+
+        // 脏代码, 若真运行到此, 那么 bounds 可能要自己算
+        vgg["constrainProportions"] = false;
+        vgg["height"] = 1.0;
+        vgg["width"] = 1.0;
+        vgg["x"] = 1.0;
+        vgg["y"] = 1.0;
+        vgg["class"] = string("rect");
+        check::ins_.add_error("analyze sketch rect fail");
     }
 }
 
@@ -125,15 +135,11 @@ void rect_change::calc_frame(const double* matrix, const nlohmann::json &bounds,
 
 double rect_change::coordinate_x_change(double x)
 {
-    //备注: 726.0 这个神奇数字, 来自测试
-    //return x - 726.0;
     return x;
 }
 
 double rect_change::coordinate_y_change(double y)
 {
-    //备注: 460.0 这个神奇数字, 来自测试
-    //double tem = y - 460.0;
     double tem = y;
     return tem ? -tem : 0;
 }
