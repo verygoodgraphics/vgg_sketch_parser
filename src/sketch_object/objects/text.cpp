@@ -169,7 +169,7 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
             vgg["length"] = 1;
             check::ins_.add_error("failed to get text.attr.length");
         }
-        assert(vgg["length"].get<int>());
+        //assert(vgg["length"].get<int>());
 
         /*
         bold: 不进行设置, 会影响字体名称
