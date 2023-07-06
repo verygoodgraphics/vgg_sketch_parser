@@ -139,11 +139,19 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
         throw sketch_exception("fail to change style");
     }
 
+    // 脏代码 
+    // 备注: sketch 实际取值和其 schema 不同
+    int start_marker_type = get_json_value(sketch, "startMarkerType", -1);
+    int end_marker_type = get_json_value(sketch, "endMarkerType", -1);
+    for (auto &item : vgg["borders"])
+    {
+        item["startMarkerType"] = start_marker_type;
+        item["endMarkerType"] = end_marker_type;
+    }
+
     /*
     备注: 未处理的项包括
     do_objectID
-    startMarkerType
-    endMarkerType
     */
 
     //textStyle: 在 text.cpp 中被处理了

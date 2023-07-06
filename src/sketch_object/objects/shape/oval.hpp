@@ -33,6 +33,7 @@ public:
     {
         assert(sketch.at("_class").get<string>() == "oval");
         abstract_shape::change(sketch, vgg);
+        vgg["path_type"] = 3;
     }
 };
 

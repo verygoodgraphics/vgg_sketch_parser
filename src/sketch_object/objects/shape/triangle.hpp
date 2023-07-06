@@ -33,6 +33,8 @@ public:
     {
         assert(sketch.at("_class").get<string>() == "triangle");
         abstract_shape::change(sketch, vgg);
+
+        vgg["path_type"] = 4;
         
         /*
         sketch中未处理的属性包括:
