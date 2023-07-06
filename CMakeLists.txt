@@ -11,3 +11,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src)
 
 add_executable(sketch_test ${CMAKE_SOURCE_DIR}/test/main.cpp)
 target_link_libraries(sketch_test PRIVATE vgg_sketch_parser)
+
+#命令行工具
+add_executable(sketch_parser_tool ${CMAKE_SOURCE_DIR}/command_line_tool/main.cpp)
+target_link_libraries(sketch_parser_tool PRIVATE vgg_sketch_parser)
