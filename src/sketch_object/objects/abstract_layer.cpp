@@ -139,7 +139,7 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         vgg["maskType"] = this->mask_type_;
 
         vgg["overflow"] = get_json_value(sketch, "presentationStyle", 0) + 1;
-        vgg["style_effect_mask_area"] = 0;
+        vgg["styleEffectMaskArea"] = 0;
 
         /*
         未处理的项:
@@ -190,7 +190,7 @@ void abstract_layer::create_default_layer(nlohmann::json &vgg)
     vgg["childObjects"] = nlohmann::json::array();
 
     vgg["overflow"] = 1;
-    vgg["style_effect_mask_area"] = 0;
+    vgg["styleEffectMaskArea"] = 0;
 }
 
 void init_child(t_child &child, int type)

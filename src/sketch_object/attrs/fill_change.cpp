@@ -84,7 +84,7 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, doub
             pattern["class"] = "pattern";
             
             auto &instance = pattern["instance"];
-            instance["class"] = string("pattern_image");
+            instance["class"] = string("patternImage");
 
             int pattern_fill_type = get_json_value(sketch, "patternFillType", 0);
             check::ins_.check_range(pattern_fill_type, 0, 3, 0, "invalid pattern fill type");

@@ -153,5 +153,5 @@ void page::create_default_artboard(nlohmann::json &out)
     out["hasBackgroundColor"] = false;
 
     out["overflow"] = 1;
-    out["style_effect_mask_area"] = 0;    
+    out["styleEffectMaskArea"] = 0;    
 }

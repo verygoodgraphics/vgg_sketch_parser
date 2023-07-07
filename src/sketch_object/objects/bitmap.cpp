@@ -67,7 +67,7 @@ void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     try
     {
         nlohmann::json image_adjust;
-        image_adjust["class"] = std::string("image_adjust");
+        image_adjust["class"] = std::string("imageAdjust");
         color_control_change::change(sketch.at("style").at("colorControls"), image_adjust["instance"]);
 
         vgg["imageAdjust"] = std::move(image_adjust);
