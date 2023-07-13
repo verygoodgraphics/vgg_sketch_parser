@@ -95,7 +95,7 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, doub
 
             double scale = get_json_value(sketch, "patternTileScale", 1.0);
             instance["matrix"] = nlohmann::json::array();
-            if (0 != fill_type)
+            if (0 != pattern_fill_type)
             {
                 scale = 1;
             }

@@ -27,10 +27,14 @@ SOFTWARE.
 #include "src/sketch_object/attrs/context_settings_change.h"
 #include "src/sketch_object/check.hpp"
 
+// 当前对象解析出的基础属性（脏代码）
+nlohmann::json _text_basic_attr;
+
 void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     assert(sketch.at("_class").get<string>() == "text");
     abstract_layer::change(sketch, vgg);
+    _text_basic_attr = vgg;
 
     try
     {
@@ -88,6 +92,9 @@ void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     {
         throw sketch_exception("fail to analyze text");
     }
+
+    // 对象自身的填充设置到每个文字上了, 没必要再保留该属性的值了
+    vgg["style"]["fills"] = nlohmann::json::array();
 }
 
 void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json &vgg)
@@ -225,14 +232,60 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
                 color_change::get_default(color);
             }
 
-            //脏代码
-            nlohmann::json fill;
-            fill["class"] = "fill";
-            fill["isEnabled"] = true;
-            fill["fillType"] = 0;
-            fill["color"] = std::move(color);
-            context_settings_change::get_default(fill["contextSettings"]);
-            vgg["fills"].emplace_back(std::move(fill));
+            const auto &global_fills = _text_basic_attr["style"]["fills"];
+            bool only_have_one_color_fill = false;
+            for (auto &item : global_fills)
+            {
+                if (!item["isEnabled"].get<bool>())
+                {
+                    continue;
+                }
+
+                if (item["fillType"] != 0)
+                {
+                    only_have_one_color_fill = false;
+                    break;
+                }
+                
+                if (only_have_one_color_fill)
+                {
+                    only_have_one_color_fill = false;
+                    break;
+                }
+
+                only_have_one_color_fill = true;
+            }                
+            if (global_fills.empty())
+            {
+                //脏代码
+                nlohmann::json fill;
+                fill["class"] = "fill";
+                fill["isEnabled"] = true;
+                fill["fillType"] = 0;
+                fill["color"] = std::move(color);
+                context_settings_change::get_default(fill["contextSettings"]);
+
+                // text 对象本身没有填充, 则使用文字对象的颜色
+                vgg["fills"].emplace_back(std::move(fill));
+            }
+            else if (only_have_one_color_fill) 
+            {
+                // 仅当对象本身的填充为纯色, 且对象本身的有效填充数目为1, 此时需要将对象本身填充的透明度和文字颜色的透明度叠加
+                for (auto &item : global_fills)
+                {
+                    vgg["fills"].emplace_back(item);
+                    auto &tmp = vgg["fills"].back()["color"]["alpha"];
+                    tmp = tmp.get<double>() * color["alpha"].get<double>();
+                }
+            }
+            else 
+            {
+                // 当对象本身存在多个填充时, 忽略文字自身的颜色
+                for (auto &item : global_fills)
+                {
+                    vgg["fills"].emplace_back(item);
+                }
+            }
         }
 
         nlohmann::json null_json;
