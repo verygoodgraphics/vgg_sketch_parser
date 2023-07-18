@@ -31,7 +31,7 @@ SOFTWARE.
 #include "src/sketch_object/check.hpp"
 
 check check::ins_;
-const char* analyze_sketch_file::_image_dir_name = "image";
+const char* analyze_sketch_file::_image_dir_name = "resources";
 // optional<valijson::Schema> analyze_sketch_file::_document_schema;
 // optional<valijson::Schema> analyze_sketch_file::_meta_schema;
 // optional<valijson::Schema> analyze_sketch_file::_user_schema;

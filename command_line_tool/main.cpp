@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }    
 
     std::string output_json_name = std::filesystem::path(output_dir).append("out.json").string();
-    std::string output_img_dir_name = std::filesystem::path(output_dir).append("image").string();
+    std::string output_img_dir_name = std::filesystem::path(output_dir).append("resources").string();
 
     std::ofstream ofs(output_json_name);
     if (ofs.is_open())
