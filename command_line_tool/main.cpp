@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         return -1;
     }    
 
-    std::string output_json_name = std::filesystem::path(output_dir).append("out.json").string();
+    std::string output_json_name = std::filesystem::path(output_dir).append("design.json").string();
     std::string output_img_dir_name = std::filesystem::path(output_dir).append("resources").string();
 
     std::ofstream ofs(output_json_name);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     }
     else 
     {
-        printf("error: failed to open out.json\n");
+        printf("error: failed to open design.json\n");
         return -1;        
     }
 

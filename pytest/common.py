@@ -17,7 +17,7 @@ def analyze(filename):
     assert result == 0
 
     try:
-        f = open('pytest/output/out.json', "rb")
+        f = open('pytest/output/design.json', "rb")
         data = f.read()
         f.close()
     except:
