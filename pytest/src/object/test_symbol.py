@@ -1,4 +1,4 @@
-﻿from common import create_collection, analyze, check_float_equal
+﻿from common import create_collection, analyze, check_float_equal, resource_root
 import src.attr.test_color as test_color
 import src.object.test_mask as test_mask
 
@@ -18,14 +18,14 @@ def check_color_override(obj, index, r, g, b, a, object_id, override_name):
     assert attr['overrideName'] == override_name
 
 def test_symbol_master_num():
-    out = analyze('pytest/resource_version_96/object/symbol/symbol_master_number.sketch')
+    out = analyze(f'{resource_root}/96/object/symbol/symbol_master_number.sketch')
     assert len(out['artboard'][0]['layers'][0]['childObjects']) == 3
     assert out['artboard'][0]['layers'][0]['childObjects'][0]['name'] == 'Master-Path'
     assert out['artboard'][0]['layers'][0]['childObjects'][1]['name'] == 'Master-Image'
     assert out['artboard'][0]['layers'][0]['childObjects'][2]['name'] == 'Master-Text'
 
 def test_symbol_position():
-    out = analyze('pytest/resource_version_96/object/symbol/symbol_position.sketch')
+    out = analyze(f'{resource_root}/96/object/symbol/symbol_position.sketch')
     assert len(out['artboard']) == 2
 
     objs = out['artboard'][0]['layers'][0]['childObjects']
@@ -54,7 +54,7 @@ def test_symbol_position():
     assert objs[5]['childObjects'][0]['class'] == 'symbolInstance'
 
 def test_allow_override_off():
-    out = create_collection('pytest/resource_version_96/object/symbol/allow_override_off.sketch')
+    out = create_collection(f'{resource_root}/96/object/symbol/allow_override_off.sketch')
     assert len(out['page1_master_path']['overrideValues']) == 0
     assert len(out['page1_master_image']['overrideValues']) == 0
     assert len(out['page1_master_text']['overrideValues']) == 0
@@ -69,7 +69,7 @@ def test_allow_override_off():
     assert len(out['Master_Nest_Double_change_symbol_and_color']['overrideValues']) == 0
 
 def test_allow_override_on_but_every_item_off():
-    out = create_collection('pytest/resource_version_96/object/symbol/allow_override_on_but_every_item_off.sketch')
+    out = create_collection(f'{resource_root}/96/object/symbol/allow_override_on_but_every_item_off.sketch')
     assert len(out['page1_master_path']['overrideValues']) == 0
     assert len(out['page1_master_image']['overrideValues']) == 0
     assert len(out['page1_master_text']['overrideValues']) == 0
@@ -185,20 +185,20 @@ def check_allow_override_on_and_every_item_on(file_name):
     check_override_value(obj, 2, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'happy life')
 
 def test_allow_override_on_and_every_item_on():
-    check_allow_override_on_and_every_item_on('pytest/resource_version_96/object/symbol/allow_override_on_and_every_item_on.sketch')
+    check_allow_override_on_and_every_item_on(f'{resource_root}/96/object/symbol/allow_override_on_and_every_item_on.sketch')
 
 def test_allow_override_on_and_every_item_on_only_change_organization_form():
-    out = check_allow_override_on_and_every_item_on('pytest/resource_version_96/object/symbol/allow_override_on_and_every_item_on_only_change_organization_form.sketch')
+    out = check_allow_override_on_and_every_item_on(f'{resource_root}/96/object/symbol/allow_override_on_and_every_item_on_only_change_organization_form.sketch')
 
 def test_background():
-    out = create_collection('pytest/resource_version_96/object/symbol/background.sketch')
+    out = create_collection(f'{resource_root}/96/object/symbol/background.sketch')
     test_color.check_color(out['Master-Path']['style']['fills'][0]['color'], 0.5452103216684341, 0.7536231884057971, 0.3088016967126193, 1.0)
     check_override_value(out['page1_master_path']['overrideValues'], 0, '59B5C63E-4B01-4D1F-8D5B-459FE06E638C', 'style.fills', [])
     check_override_value(out['Master_Nest_Path_change_3_attr']['overrideValues'], 0, '59B5C63E-4B01-4D1F-8D5B-459FE06E638C', 'style.fills', [])
     check_override_value(out['page1_master_image']['overrideValues'], 0, '87621494-BE66-4837-9F83-EE3D6390C1D6', 'style.fills', [])
 
 def test_symbol_mask():
-    relation = test_mask.get_relation('pytest/resource_version_96/object/symbol/mask.sketch')
+    relation = test_mask.get_relation(f'{resource_root}/96/object/symbol/mask.sketch')
     test_mask.judge(relation, 'outline_mask', ['outline_mask'], [], 1)
     test_mask.judge(relation, 'be_masked', ['outline_mask'], [], 0)
     test_mask.judge(relation, 'outline_mask_in_master', ['outline_mask_in_master'], [], 1)
@@ -221,7 +221,7 @@ def test_symbol_mask():
 
 
 def test_88_1_allow_override_on_and_every_item_on():
-    out = create_collection('pytest/resource/object/symbol/allow_override_on_and_every_item_on.sketch')
+    out = create_collection(f'{resource_root}/88_1/object/symbol/allow_override_on_and_every_item_on.sketch')
 
     obj = out['master_nest_image_change_image']['overrideValues']
     assert len(obj) == 1
@@ -256,7 +256,7 @@ def test_88_1_allow_override_on_and_every_item_on():
                          'double')  
     
 def test_88_1_allow_override_on_but_every_item_off():
-    out = create_collection('pytest/resource/object/symbol/allow_override_on_but_every_item_off.sketch')
+    out = create_collection(f'{resource_root}/88_1/object/symbol/allow_override_on_but_every_item_off.sketch')
     assert len(out['master_nest_image_change_image']['overrideValues']) == 0
     assert len(out['page1_path']['overrideValues']) == 0
     assert len(out['page1_image']['overrideValues']) == 0
@@ -264,7 +264,7 @@ def test_88_1_allow_override_on_but_every_item_off():
     assert len(out['page1_master_nest']['overrideValues']) == 0
 
 def test_88_1_allow_override_off():
-    out = create_collection('pytest/resource/object/symbol/allow_override_off.sketch')
+    out = create_collection(f'{resource_root}/88_1/object/symbol/allow_override_off.sketch')
     assert len(out['master_nest_image_change_image']['overrideValues']) == 0
     assert len(out['page1_path']['overrideValues']) == 0
     assert len(out['page1_image']['overrideValues']) == 0

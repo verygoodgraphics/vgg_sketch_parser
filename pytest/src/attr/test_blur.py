@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, check_name, analyze
+﻿from common import check_float_equal, check_name, analyze, resource_path
 
 def check_blur(blur, type, isEnabled, center, saturation, radius = None, motionAngle = None):
     assert blur['type'] == type
@@ -21,7 +21,7 @@ def check_blur(blur, type, isEnabled, center, saturation, radius = None, motionA
         assert 'motionAngle' not in blur    
 
 def test_blur():
-    out = analyze('pytest/resource/attr/blur.sketch')
+    out = analyze(f'{resource_path}/attr/blur.sketch')
     objs = out['artboard'][0]['layers'][0]['childObjects']
 
     def check(id, name, type, isEnabled, center, saturation, radius = None, motionAngle = None):

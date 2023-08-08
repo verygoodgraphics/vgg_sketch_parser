@@ -11,4 +11,4 @@ except:
     pass
 
 pytest.main(["pytest/src"])
-#pytest.main(["pytest/src/object/test_basic_attr.py"])
+#pytest.main(["pytest/src/object/test_path.py"])

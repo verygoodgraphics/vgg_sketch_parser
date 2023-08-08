@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, check_name, analyze
+﻿from common import check_float_equal, check_name, analyze, resource_path
 import src.attr.test_color as test_color
 
 def check_gradient_from_or_to(gradient, check_from: bool, pt: list):
@@ -12,7 +12,7 @@ def check_stops_basic(stop, position, midPoint):
     check_float_equal(stop["midPoint"], midPoint)
 
 def test_gradient():
-    out = analyze('pytest/resource/attr/gradient.sketch')
+    out = analyze(f'{resource_path}/attr/gradient.sketch')
     objs = out['artboard'][0]['layers'][0]['childObjects']
 
     obj = objs[0]

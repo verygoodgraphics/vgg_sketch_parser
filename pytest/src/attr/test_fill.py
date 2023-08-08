@@ -1,4 +1,4 @@
-﻿from common import analyze
+﻿from common import analyze, resource_path
 
 def check_isEnabled(fill, value):
     assert fill["isEnabled"] == value
@@ -7,7 +7,7 @@ def check_fillType(fill, value):
     assert fill["fillType"] == value
 
 def test_fill():
-    out = analyze('pytest/resource/attr/fill.sketch')
+    out = analyze(f'{resource_path}/attr/fill.sketch')
 
     def get_objs(id):
         return out['artboard'][id]['layers'][0]['childObjects']

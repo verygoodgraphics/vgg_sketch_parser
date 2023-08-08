@@ -1,4 +1,4 @@
-﻿from common import analyze
+﻿from common import analyze, resource_path
 
 def collection_info(obj, out):
     '''
@@ -59,7 +59,7 @@ def get_relation(file_name):
     return relation
 
 def test_outline_mask():
-    relation = get_relation('pytest/resource/object/mask/outline_mask.sketch')
+    relation = get_relation(f'{resource_path}/object/mask/outline_mask.sketch')
 
     judge(relation, 'a0', ['a0'], [], 1)
     judge(relation, 'a1', ['a0'])
@@ -81,7 +81,7 @@ def test_outline_mask():
     judge(relation, 'a13')
 
 def test_alpha_mask():
-    relation = get_relation('pytest/resource/object/mask/alpha_mask.sketch')
+    relation = get_relation(f'{resource_path}/object/mask/alpha_mask.sketch')
 
     judge(relation, 'a0_alpha_mask', [], ['a0_alpha_mask'], 2)
     judge(relation, 'a1', [], ['a0_alpha_mask'])
@@ -99,7 +99,7 @@ def test_alpha_mask():
     judge(relation, 'a10_stop_by_artboard')
 
 def test_compound_mask():
-    relation = get_relation('pytest/resource/object/mask/compound_mask.sketch')
+    relation = get_relation(f'{resource_path}/object/mask/compound_mask.sketch')
 
     judge(relation, 'a0_outline_mask', ['a0_outline_mask'], [], 1)
 
@@ -135,7 +135,7 @@ def test_compound_mask():
     judge(relation, 'b11', ['b0_outline_mask'])
 
 def test_group_shape_group_mask():
-    relation = get_relation('pytest/resource/object/mask/grou_shape_group_mask.sketch')
+    relation = get_relation(f'{resource_path}/object/mask/grou_shape_group_mask.sketch')
 
     judge(relation, 'a0', ['a2_group_as_outline_mask'])
     judge(relation, 'a1', ['a2_group_as_outline_mask'])

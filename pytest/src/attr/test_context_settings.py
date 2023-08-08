@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, check_name, analyze
+﻿from common import check_float_equal, check_name, analyze, resource_path
 
 def check_context_settings(cs, blendMode, opacity, isolateBlending = False, transparencyKnockoutGroup = 0):
     assert cs["blendMode"] == blendMode
@@ -7,7 +7,7 @@ def check_context_settings(cs, blendMode, opacity, isolateBlending = False, tran
     assert cs["transparencyKnockoutGroup"] == transparencyKnockoutGroup
 
 def test_context_settings():
-    out = analyze('pytest/resource/attr/context_settings.sketch')
+    out = analyze(f'{resource_path}/attr/context_settings.sketch')
     objs = out['artboard'][0]['layers'][0]['childObjects']
 
     def get(obj):

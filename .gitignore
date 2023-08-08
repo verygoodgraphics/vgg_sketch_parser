@@ -5,7 +5,7 @@ resource*/
 
 # for pytest
 pytest/output
-pytest/resource
 __pycache__
 pytest/sketch_parser_tool.exe
 pytest/vgg-format.json
+.pytest_cache

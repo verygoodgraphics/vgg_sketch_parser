@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, analyze
+﻿from common import check_float_equal, analyze, resource_path
 
 def check_color_control_change(attr, isEnabled, brightness, contrast, hue, saturation):
     assert attr["isEnabled"] == isEnabled
@@ -8,7 +8,7 @@ def check_color_control_change(attr, isEnabled, brightness, contrast, hue, satur
     check_float_equal(attr["saturation"], saturation)
 
 def test_color_control_change():
-    out = analyze('pytest/resource/attr/color_control_change.sketch')
+    out = analyze(f'{resource_path}/attr/color_control_change.sketch')
     objs = out['artboard'][0]['layers'][0]['childObjects']    
 
     check_color_control_change(objs[0]["imageAdjust"]["instance"],

@@ -2,6 +2,10 @@
 import jsonschema
 import json
 
+resource_root = 'D:/work/data/sketch/pytest'
+#resource_path = f'{resource_root}/88_1'
+resource_path = f'{resource_root}/96'
+
 with open("pytest/vgg-format.json") as f:
     str_schema = f.read()
     schema = json.loads(str_schema)

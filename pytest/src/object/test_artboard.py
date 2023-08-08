@@ -1,8 +1,8 @@
-﻿from common import analyze
+﻿from common import analyze, resource_path
 import src.attr.test_color as test_color
 
 def test_artboard():
-    out = analyze('pytest/resource/object/artboard.sketch')
+    out = analyze(f'{resource_path}/object/artboard.sketch')
 
     assert out['artboard'][0]['hasBackgroundColor']
     assert not out['artboard'][1]['hasBackgroundColor']

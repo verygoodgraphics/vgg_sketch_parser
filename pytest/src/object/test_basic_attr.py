@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, check_name, analyze
+﻿from common import check_float_equal, check_name, analyze, resource_path
 
 def check_id(obj, value):
     assert obj["id"] == value
@@ -21,7 +21,7 @@ def check_matrix(obj, value):
         check_float_equal(x, y)
 
 def test_basic_attr():
-    out = analyze('pytest/resource/object/basic_attr.sketch')
+    out = analyze(f'{resource_path}/object/basic_attr.sketch')
     
     def get_objs(id):
         return out['artboard'][id]['layers'][0]['childObjects']

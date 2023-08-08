@@ -7,7 +7,7 @@ def check_color(color, r, g, b, a):
     common.check_float_equal(color["alpha"], a)
 
 def test_color():
-    out = common.analyze('pytest/resource/attr/color.sketch')
+    out = common.analyze(f'{common.resource_path}/attr/color.sketch')
 
     objs = out["artboard"][0]["layers"][0]["childObjects"]
 

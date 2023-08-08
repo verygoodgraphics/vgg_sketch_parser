@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, analyze
+﻿from common import check_float_equal, analyze, resource_path
 import src.attr.test_color as test_color
 
 def check_isEnabled(border, value):
@@ -35,7 +35,7 @@ def check_MarkerType(border, start: bool, value):
     assert border[tmp] == value
 
 def test_border():
-    out = analyze('pytest/resource/attr/border.sketch')
+    out = analyze(f'{resource_path}/attr/border.sketch')
 
     def get_objs(id):
         return out['artboard'][id]['layers'][0]['childObjects']

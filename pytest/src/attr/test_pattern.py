@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, check_name, analyze
+﻿from common import check_float_equal, check_name, analyze, resource_path
 
 def check_pattern(pattern, fillType, imageFileName, matrix = [1, 0, 0, 1, 0, 0]):
     assert pattern["fillType"] == fillType
@@ -8,7 +8,7 @@ def check_pattern(pattern, fillType, imageFileName, matrix = [1, 0, 0, 1, 0, 0])
     assert pattern["imageTileMirrored"] == False
 
 def test_pattern():
-    out = analyze('pytest/resource/attr/pattern.sketch')
+    out = analyze(f'{resource_path}/attr/pattern.sketch')
     objs = out['artboard'][0]['layers'][0]['childObjects']
 
     obj = objs[0]

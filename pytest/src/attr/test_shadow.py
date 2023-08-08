@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, check_name, analyze
+﻿from common import check_float_equal, check_name, analyze, resource_path
 import src.attr.test_color as test_color
 import src.attr.test_context_settings as test_context_settings
 
@@ -18,7 +18,7 @@ def check_shadow_basic(shadow, isEnabled, offsetX, offsetY, blur, spread, inner,
         assert 'showBehindTransparentAreas' not in shadow
 
 def test_shadow():
-    out = analyze('pytest/resource/attr/shadow.sketch')
+    out = analyze(f'{resource_path}/attr/shadow.sketch')
     objs = out['artboard'][0]['layers'][0]['childObjects']
 
     # zero shadow
@@ -54,7 +54,7 @@ def test_shadow():
     test_context_settings.check_context_settings(obj["style"]["shadows"][1]["contextSettings"], 3, 1.0)
 
 def test_inner_shadow():
-    out = analyze('pytest/resource/attr/shadow_inner.sketch')
+    out = analyze(f'{resource_path}/attr/shadow_inner.sketch')
     objs = out['artboard'][0]['layers'][0]['childObjects']
 
     # zero shadow

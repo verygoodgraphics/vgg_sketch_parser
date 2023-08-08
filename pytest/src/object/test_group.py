@@ -1,7 +1,7 @@
-﻿from common import create_collection
+﻿from common import create_collection, resource_path
 
 def test_group():
-    relation = create_collection('pytest/resource/object/group.sketch')
+    relation = create_collection(f'{resource_path}/object/group.sketch')
 
     def check_group(name, value):
         obj = relation[name]

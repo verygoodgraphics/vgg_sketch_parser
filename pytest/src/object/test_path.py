@@ -1,7 +1,7 @@
-﻿from common import create_collection, check_float_equal
+﻿from common import create_collection, check_float_equal, resource_path
 
 def test_path():
-    relation = create_collection('pytest/resource/object/path.sketch')
+    relation = create_collection(f'{resource_path}/object/path.sketch')
 
     def check_radius(name, value: list):
         obj = relation[name]

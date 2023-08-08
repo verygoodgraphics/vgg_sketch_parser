@@ -1,10 +1,10 @@
-﻿from common import create_collection, check_float_equal
+﻿from common import create_collection, check_float_equal, resource_path
 import src.attr.test_fill as test_fill
 import src.attr.test_color as test_color
 import src.attr.test_context_settings as test_context_settings
 
 def test_text():
-    relation = create_collection('pytest/resource/object/text.sketch')
+    relation = create_collection(f'{resource_path}/object/text.sketch')
 
     def check_attr_item(name, attr_name, attr_value):
         obj = relation[name]

@@ -1,7 +1,7 @@
-﻿from common import create_collection
+﻿from common import create_collection, resource_path
 
 def test_image():
-    relation = create_collection('pytest/resource/object/image.sketch')
+    relation = create_collection(f'{resource_path}/object/image.sketch')
 
     obj = relation["fill replace"]
     assert obj["fillReplacesImage"]
