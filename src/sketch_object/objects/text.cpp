@@ -28,13 +28,13 @@ SOFTWARE.
 #include "src/sketch_object/check.hpp"
 
 // 当前对象解析出的基础属性（脏代码）
-nlohmann::json _text_basic_attr;
+// nlohmann::json _text_basic_attr;
 
 void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     assert(sketch.at("_class").get<string>() == "text");
     abstract_layer::change(sketch, vgg);
-    _text_basic_attr = vgg;
+    //_text_basic_attr = vgg;
 
     try
     {
@@ -93,8 +93,8 @@ void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         throw sketch_exception("fail to analyze text");
     }
 
-    // 对象自身的填充设置到每个文字上了, 没必要再保留该属性的值了
-    vgg["style"]["fills"] = nlohmann::json::array();
+    // 对象自身的填充设置到每个文字上了, 没必要再保留该属性的值了(目前这件事没做了)
+    // vgg["style"]["fills"] = nlohmann::json::array();
 }
 
 void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json &vgg)
@@ -230,6 +230,31 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
             else
             {
                 color_change::get_default(color);
+            }         
+
+            //脏代码
+            nlohmann::json fill;
+            fill["class"] = "fill";
+            fill["isEnabled"] = true;
+            fill["fillType"] = 0;
+            fill["color"] = std::move(color);
+            context_settings_change::get_default(fill["contextSettings"]);
+            vgg["fills"].emplace_back(std::move(fill));
+            
+            vgg["fillUseType"] = 1;
+        }
+
+        // 内外 fill 拟合的版本
+        /*
+        {
+            nlohmann::json color;
+            if (it != attributes.end())
+            {
+                color_change::change(*it, color);
+            }
+            else
+            {
+                color_change::get_default(color);
             }
 
             const auto &global_fills = _text_basic_attr["style"]["fills"];
@@ -287,6 +312,7 @@ void text::string_attribute_change(const nlohmann::json &sketch, nlohmann::json 
                 }
             }
         }
+        */
 
         nlohmann::json null_json;
         it = attributes.find("paragraphStyle");

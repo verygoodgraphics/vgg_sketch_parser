@@ -26,11 +26,14 @@ SOFTWARE.
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/sketch_object/mask.h"
 #include "src/sketch_object/check.hpp"
+#include "src/sketch_object/attrs/fill_change.h"
 #include <regex>
 #include <algorithm>
 #include <array>
 
 t_child symbol_master::child_;
+symbol_master::t_master_info symbol_master::masters_;
+std::unordered_map<string, bool> symbol_master::override_switch_;
 
 symbol_master::symbol_master()
 {
@@ -45,42 +48,46 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
     assert(sketch.at("_class").get<string>() == "symbolMaster");
 
+    string symbol_id;
+    unique_ptr<symbol_master_attr> master_attr(new symbol_master_attr);
+    vgg["overflow"] = 2;
+
     try 
     {
         vgg["class"] = string("symbolMaster");
-        vgg["hasBackgroundColor"] = get_json_value(sketch, "hasBackgroundColor", false);
 
-        auto it = sketch.find("backgroundColor");
+        if (get_json_value(sketch, "hasBackgroundColor", false))
+        {
+            auto it = sketch.find("backgroundColor");
+            if (it != sketch.end())
+            {
+                nlohmann::json color;
+                color_change::change(*it, color);
+                auto fill = fill_change::construct_from_color(std::move(color));
+
+                assert(vgg.at("style").at("fills").empty());
+                vgg.at("style").at("fills").emplace_back(std::move(fill));
+            }
+        }
+
+        master_attr->include_background_color_in_instance_ = get_json_value(sketch, "includeBackgroundColorInInstance", true);
+        master_attr->allow_override_ = get_json_value(sketch, "allowsOverrides", false);
+        symbol_id = sketch.at("symbolID").get<string>();
+
+        auto it = sketch.find("overrideProperties");
         if (it != sketch.end())
         {
-            color_change::change(*it, vgg["backgroundColor"]);
-        }
-        else if (vgg["hasBackgroundColor"].get<bool>())
-        {
-            //throw sketch_exception("fail to get symbol master background color");
-            color_change::get_default(vgg["backgroundColor"]);
-            check::ins_.add_error("failed to get symbol-master.backgroundColor");
-        }
-
-        vgg["includeBackgroundColorInInstance"] = get_json_value(sketch, "includeBackgroundColorInInstance", true);
-        vgg["symbolID"] = sketch.at("symbolID").get<string>();
-        vgg["allowsOverrides"] = get_json_value(sketch, "allowsOverrides", false);
-
-        vgg["overrideProperties"] = nlohmann::json::array();
-        it = sketch.find("overrideProperties");
-        if (it != sketch.end())
-        {
-            try 
+            for (auto &item : *it)
             {
-                symbol_master::override_properties_change(*it, vgg["overrideProperties"]);
-            }
-            catch(sketch_exception &e)
-            {
-                check::ins_.add_error(e.get());
-            }
-            catch(...)
-            {
-                check::ins_.add_error("failed to change symbol-master.overrideProperties");
+                try 
+                {
+                    assert(symbol_master::override_switch_.find(item.at("overrideName").get<string>()) == symbol_master::override_switch_.end());
+                    symbol_master::override_switch_[item.at("overrideName").get<string>()] = item.at("canOverride").get<bool>();
+                }
+                catch(...)
+                {
+                    check::ins_.add_error("failed to change symbol-master.overrideProperties");
+                }
             }
         }
         
@@ -124,63 +131,17 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     {
         assert(false);
         throw sketch_exception("fail to analyze symbol master");
-    }       
+    }
+
+    if (!symbol_id.empty())
+    {
+        master_attr->master_data_ = vgg;
+        symbol_master::masters_[symbol_id] = std::move(master_attr);
+    }
 }
 
-void symbol_master::override_name_check(const string &str)
-{
-    //from override-name.yaml
-    /*
-    const static std::array<std::regex, 4> a_re = 
-    { 
-        std::regex("[0-9A-F]{8}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{12}((_stringValue$)|\\/)"),
-        std::regex("[0-9A-F]{8}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{12}((_symbolID$)|\\/)"),
-        std::regex("[0-9A-F]{8}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{12}((_image$)|\\/)"),
-        std::regex("[0-9A-F]{8}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{12}((_layerStyle$)|\\/)")
-    };
-
-    if (!std::any_of(a_re.begin(), a_re.end(), [&str](const std::regex &re)
-    {
-        return std::regex_match(str, re);
-    }))
-    {
-        throw sketch_exception("fail to match override name");
-    }
-    */
-
-   //备注: 不对该项进行校验
-}
-
-void symbol_master::override_properties_change(const nlohmann::json &sketch, nlohmann::json &vgg)
-{
-    vgg = nlohmann::json::array();
-
-    try
-    {
-        if (!sketch.is_array())
-        {
-            throw;
-        }
-
-        for (auto &item : sketch)
-        {
-            assert(item.at("_class").get<string>() == "MSImmutableOverrideProperty");
-            
-            nlohmann::json vgg_item;
-            vgg_item["class"] = string("MSImmutableOverrideProperty");
-            vgg_item["canOverride"] = item.at("canOverride").get<bool>();
-            vgg_item["overrideName"] = item.at("overrideName");
-            symbol_master::override_name_check(vgg_item["overrideName"].get<string>());
-
-            vgg.emplace_back(std::move(vgg_item));
-        }
-    }
-    catch (sketch_exception &e)
-    {
-        throw e;
-    }
-    catch (...)
-    {
-        throw sketch_exception("fail to analyze override properties");
-    }
+void symbol_master::clear_master() 
+{ 
+    symbol_master::override_switch_.clear(); 
+    symbol_master::masters_.clear(); 
 }

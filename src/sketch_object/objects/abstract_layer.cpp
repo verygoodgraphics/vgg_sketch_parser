@@ -214,6 +214,7 @@ void init_child(t_child &child, int type)
     child["shapeGroup"].reset(new shape_group);
     
     child["symbolInstance"].reset(new symbol_instance);
+    child["symbolMaster"].reset(new symbol_master);
 
     //备注: slice.schema.yaml hotspot.schema.yaml 不进行处理
 
@@ -222,7 +223,6 @@ void init_child(t_child &child, int type)
         case 0: //page
         {
             child["artboard"].reset(new artboard);
-            child["symbolMaster"].reset(new symbol_master);
             break;
         }
         case 1: //artboard

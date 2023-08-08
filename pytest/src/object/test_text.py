@@ -62,61 +62,65 @@ def test_text():
     assert relation["a13_align_v"]["verticalAlignment"] == 1
     assert relation["a14_align_v"]["verticalAlignment"] == 2
 
-    def check_fill_type(name, fill_type):
+    def check_obj_style_fill_type(name, fill_type):
         obj = relation[name]
-        assert len(obj["attr"]) == 1
-        fill = obj["attr"][0]["fills"][0]
+        assert len(obj['style']['fills']) == 1
+        fill = obj['style']['fills'][0]
         test_fill.check_isEnabled(fill, True)
         test_fill.check_fillType(fill, fill_type)
-        assert not obj["style"]["fills"]
-    check_fill_type('a15_fill', 1)
-    check_fill_type('a16_fill', 1)
-    check_fill_type('a_17_fill', 1)
-    check_fill_type('a_18_fill', 0)
-    check_fill_type('a_19_fill_pattern', 2)
-    check_fill_type('a_20_fill_pattern', 2)
+    check_obj_style_fill_type('a15_fill', 1)
+    check_obj_style_fill_type('a16_fill', 1)
+    check_obj_style_fill_type('a_17_fill', 1)
+    check_obj_style_fill_type('a_18_fill', 0)
+    check_obj_style_fill_type('a_19_fill_pattern', 2)
+    check_obj_style_fill_type('a_20_fill_pattern', 2)
 
-    check_fill_type('szn_tmp_test_0', 1)
+    check_obj_style_fill_type('szn_tmp_test_0', 1)
     test_context_settings.check_context_settings(relation['szn_tmp_test_0']["attr"][0]["fills"][0]["contextSettings"], 0, 1)
     
     obj = relation['szn_tmp_test_1']
     check_attr_item('szn_tmp_test_1', 'length', [4, 5])
-    assert len(obj['attr'][0]["fills"]) == 2
-    fill_0 = obj['attr'][0]['fills'][0]
-    fill_1 = obj['attr'][0]['fills'][1]
-    test_fill.check_isEnabled(fill_0, True)
-    test_fill.check_isEnabled(fill_1, False)
-    test_color.check_color(fill_0['color'], 0.4312062628075353, 0.05259809119830333, 0.8985507246376812, 0.25)
-    test_color.check_color(fill_1['color'], 0.9130434782608695, 0.02226935312831391, 0.02226935312831391, 0.005)
-    assert len(obj['attr'][1]["fills"]) == 2
-    fill_0 = obj['attr'][1]['fills'][0]
-    fill_1 = obj['attr'][1]['fills'][1]
+    assert len(obj['attr'][0]["fills"]) == 1
+    assert len(obj['style']['fills']) == 2
+
+    fill_0 = obj['style']['fills'][0]
+    fill_1 = obj['style']['fills'][1]
     test_fill.check_isEnabled(fill_0, True)
     test_fill.check_isEnabled(fill_1, False)
     test_color.check_color(fill_0['color'], 0.4312062628075353, 0.05259809119830333, 0.8985507246376812, 0.5)
     test_color.check_color(fill_1['color'], 0.9130434782608695, 0.02226935312831391, 0.02226935312831391, 0.01)
+    assert len(obj['attr'][0]["fills"]) == 1
+    assert len(obj['attr'][1]["fills"]) == 1
+    fill_0 = obj['attr'][0]['fills'][0]
+    fill_1 = obj['attr'][1]['fills'][0]
+    test_fill.check_isEnabled(fill_0, True)
+    test_fill.check_isEnabled(fill_1, True)
+    test_color.check_color(fill_0['color'], 0.9565217391304348, 0, 0, 0.5)
+    test_color.check_color(fill_1['color'], 0.9565217391304348, 0, 0, 1)
 
     obj = relation['szn_tmp_test_2']
     check_attr_item('szn_tmp_test_2', 'length', [4, 5])
-    assert len(obj['attr'][0]["fills"]) == 2
-    fill_0 = obj['attr'][0]['fills'][0]
-    fill_1 = obj['attr'][0]['fills'][1]
+    assert len(obj['style']["fills"]) == 2
+    fill_0 = obj['style']['fills'][0]
+    fill_1 = obj['style']['fills'][1]
     test_fill.check_isEnabled(fill_0, True)
     test_fill.check_isEnabled(fill_1, True)
     test_color.check_color(fill_0['color'], 0.4312062628075353, 0.05259809119830333, 0.8985507246376812, 0.5)
     test_color.check_color(fill_1['color'], 1, 0.02926829268292686, 0.02926829268292686, 0.1)
-    fill_0 = obj['attr'][1]['fills'][0]
-    fill_1 = obj['attr'][1]['fills'][1]
+    assert len(obj['attr'][0]["fills"]) == 1
+    assert len(obj['attr'][1]["fills"]) == 1
+    fill_0 = obj['attr'][0]['fills'][0]
+    fill_1 = obj['attr'][1]['fills'][0]
     test_fill.check_isEnabled(fill_0, True)
     test_fill.check_isEnabled(fill_1, True)
-    test_color.check_color(fill_0['color'], 0.4312062628075353, 0.05259809119830333, 0.8985507246376812, 0.5)
-    test_color.check_color(fill_1['color'], 1, 0.02926829268292686, 0.02926829268292686, 0.1)    
+    test_color.check_color(fill_0['color'], 0.9565217391304348, 0, 0, 0.5)
+    test_color.check_color(fill_1['color'], 0.9565217391304348, 0, 0, 1)
 
     obj = relation['a_21_multiple_fill_blend_mode']
-    test_color.check_color(obj["attr"][0]["fills"][0]["color"], 0.9492753623188406, 0.0324142806645458, 0.0324142806645458, 0.5)
-    test_color.check_color(obj["attr"][0]["fills"][1]["color"], 0.2372245993666991, 0.05326970661010962, 0.9927536231884058, 0.6)
-    test_context_settings.check_context_settings(obj["attr"][0]["fills"][0]["contextSettings"], 0, 1)
-    test_context_settings.check_context_settings(obj["attr"][0]["fills"][1]["contextSettings"], 2, 1)
+    test_color.check_color(obj['style']['fills'][0]["color"], 0.9492753623188406, 0.0324142806645458, 0.0324142806645458, 0.5)
+    test_color.check_color(obj['style']['fills'][1]["color"], 0.2372245993666991, 0.05326970661010962, 0.9927536231884058, 0.6)
+    test_context_settings.check_context_settings(obj['style']['fills'][0]["contextSettings"], 0, 1)
+    test_context_settings.check_context_settings(obj['style']['fills'][1]["contextSettings"], 2, 1)
 
     obj = relation['a_22_border']
     assert len(obj['style']['borders']) == 1

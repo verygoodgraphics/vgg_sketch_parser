@@ -29,6 +29,8 @@ SOFTWARE.
 #include "boost/algorithm/string.hpp"
 #include "src/sketch_object/mask.h"
 #include "src/sketch_object/check.hpp"
+#include "src/sketch_object/objects/symbol_master.h"
+#include "src/sketch_object/objects/symbol_instance.h"
 
 check check::ins_;
 const char* analyze_sketch_file::_image_dir_name = "resources";
@@ -181,11 +183,11 @@ void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file
             mask::add_parent_mask_to_child(item.at("layers").at(0));
         }
 
-        auto &symbol_masters = json_out.at("symbolMaster");
-        for (auto &item : symbol_masters)
-        {
-            mask::add_parent_mask_to_child(item);
-        }
+        // auto &symbol_masters = json_out.at("symbolMaster");
+        // for (auto &item : symbol_masters)
+        // {
+        //     mask::add_parent_mask_to_child(item);
+        // }
     }
 }
 
@@ -194,6 +196,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
 {
     //analyze_sketch_file::init();
     
+    symbol_master::clear_master();
     check::ins_.reset();
     extract::t_extract_result sketch_file_info;
     extract::set_file(static_cast<const char*>(content), len, sketch_file_info);
@@ -235,7 +238,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     json_out["fileType"] = 1;
     json_out["fileName"] = string(name);
     json_out["artboard"] = nlohmann::json::array();
-    json_out["symbolMaster"] = nlohmann::json::array();
+    //json_out["symbolMaster"] = nlohmann::json::array();
 
     if (sketch_file_info.empty())
     {
@@ -246,6 +249,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     vector<string> vec_page_file_path;
     analyze_sketch_file::deal_meta(sketch_file_info, vec_page_file_path);
     analyze_sketch_file::deal_page(sketch_file_info, vec_page_file_path, json_out);
-
+    symbol_instance::deal_override_attr(json_out);
+    
     return check::ins_.get_error().empty();
 }

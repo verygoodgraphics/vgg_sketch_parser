@@ -65,10 +65,10 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 vgg["artboard"].emplace_back(std::move(out));
                 default_artboard_mask.reset_mask();
             }
-            else if (name == "symbolMaster")
-            {
-                vgg["symbolMaster"].emplace_back(std::move(out));
-            }
+            // else if (name == "symbolMaster")
+            // {
+            //     vgg["symbolMaster"].emplace_back(std::move(out));
+            // }
             else 
             {
                 if (!default_artboard)

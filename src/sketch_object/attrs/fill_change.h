@@ -44,6 +44,9 @@ public:
     */
     static void change(const nlohmann::json &sketch, nlohmann::json &vgg, 
         double bound_width, double bound_height);
+
+public:
+    static nlohmann::json construct_from_color(nlohmann::json &&color);
 };
 
 #endif

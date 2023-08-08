@@ -57,16 +57,11 @@ def __collection(obj, out):
     if obj["class"] != "layer":
         out[obj["name"]] = obj
 
-    try:
+    if 'childObjects' in obj:
         for item in obj['childObjects']:
-            __collection(item, out)
-    except:
-        pass
+            __collection(item, out) 
     
-    try:
+    if 'shape' in obj:
         for item in obj["shape"]["subshapes"]:
             if item["subGeometry"]["class"] != "contour":
                 __collection(item["subGeometry"], out)
-    except:
-        pass
-    

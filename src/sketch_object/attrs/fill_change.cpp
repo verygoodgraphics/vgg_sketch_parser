@@ -163,3 +163,14 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, doub
         throw sketch_exception("fail to change fill");
     }
 }
+
+nlohmann::json fill_change::construct_from_color(nlohmann::json &&color)
+{
+    nlohmann::json result = nlohmann::json::object();
+    result["class"] = "fill";
+    result["isEnabled"] = true;
+    result["color"] = std::move(color);
+    result["fillType"] = 0;
+    context_settings_change::get_default(result["contextSettings"]);
+    return result;
+}
