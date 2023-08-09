@@ -36,8 +36,6 @@ public:
      * @param sketch sketch 的输入
      * @param vgg 符合 vgg-format 的输出
      * 
-     * @exception sketch_exception
-     * 
      * @note 会对 vgg 先进行 clear
     */
     static void change(const nlohmann::json &sketch, nlohmann::json &vgg);

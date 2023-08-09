@@ -38,7 +38,7 @@ def test_border():
     out = analyze(f'{resource_path}/attr/border.sketch')
 
     def get_objs(id):
-        return out['artboard'][id]['layers'][0]['childObjects']
+        return out['frames'][id]['childObjects']
 
     def get_border(obj, border_id):
         return obj["style"]["borders"][border_id]

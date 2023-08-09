@@ -87,33 +87,24 @@ void symbol_instance::deal_override_attr(nlohmann::json &vgg_format)
 
     // 复制一份, 防止迭代器失效
     // const auto objs = vgg_format;
-    for (auto &artboard : vgg_format.at("artboard"))
+    for (auto &frame : vgg_format.at("frames"))
     {
-        for (auto &layer : artboard.at("layers"))
-        {
-            symbol_instance::collection_objs(layer);
-        }
+        symbol_instance::collection_objs(frame);
     }
 
-    for (auto &artboard : vgg_format.at("artboard"))
+    for (auto &frame : vgg_format.at("frames"))
     {
-        for (auto &layer : artboard.at("layers"))
-        {
-            symbol_instance::recursive_deal(layer, symbol_instance::override_attr);
-        }
+        symbol_instance::recursive_deal(frame, symbol_instance::override_attr);
     }
 
-    for (auto &artboard : vgg_format.at("artboard"))
+    for (auto &frame : vgg_format.at("frames"))
     {
-        for (auto &layer : artboard.at("layers"))
+        symbol_instance::recursive_deal(frame, [](nlohmann::json &obj)
         {
-            symbol_instance::recursive_deal(layer, [](nlohmann::json &obj)
-            {
-                assert(obj.at("class") == "symbolInstance");
-                assert(obj.find("original_info") != obj.end());
-                obj.erase("original_info");                
-            });
-        }
+            assert(obj.at("class") == "symbolInstance");
+            assert(obj.find("original_info") != obj.end());
+            obj.erase("original_info");                
+        });
     }
 }
 

@@ -167,33 +167,7 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     }
 }
 
-void abstract_layer::create_default_layer(nlohmann::json &vgg)
-{
-    vgg.clear();
-
-    vgg["id"] = string("1");
-    vgg["name"] = string("layer");
-    vgg["isLocked"] = false;
-    vgg["visible"] = true;
-    context_settings_change::get_default(vgg["contextSettings"]);
-    style_change::get_default(vgg["style"]);
-
-    double matrix[] = { 1, 0, 0, 1, 0, 0 };
-    rect_change::form_matrix(matrix, vgg["matrix"]);
-
-    vgg["alphaMaskBy"] = nlohmann::json::array();
-    vgg["outlineMaskBy"] = nlohmann::json::array();
-    //vgg["isMask"] = false;
-    vgg["maskType"] = 0;
-
-    vgg["class"] = string("layer");
-    vgg["childObjects"] = nlohmann::json::array();
-
-    vgg["overflow"] = 1;
-    vgg["styleEffectMaskArea"] = 0;
-}
-
-void init_child(t_child &child, int type)
+void init_child(t_child &child)
 {
     if (!child.empty())
     {
@@ -216,24 +190,8 @@ void init_child(t_child &child, int type)
     child["symbolInstance"].reset(new symbol_instance);
     child["symbolMaster"].reset(new symbol_master);
 
-    //备注: slice.schema.yaml hotspot.schema.yaml 不进行处理
+    // 第三方软件生成的 sketch 文件, 支持 artboard 嵌套
+    child["artboard"].reset(new artboard);
 
-    switch (type)
-    {
-        case 0: //page
-        {
-            child["artboard"].reset(new artboard);
-            break;
-        }
-        case 1: //artboard
-        case 2: //group
-        {
-            break;
-        } 
-        default:
-        {
-            assert(false);
-            break;
-        }
-    }
+    //备注: slice.schema.yaml hotspot.schema.yaml 不进行处理
 }

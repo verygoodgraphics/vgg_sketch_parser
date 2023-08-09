@@ -4,6 +4,5 @@ import src.attr.test_color as test_color
 def test_artboard():
     out = analyze(f'{resource_path}/object/artboard.sketch')
 
-    assert out['artboard'][0]['hasBackgroundColor']
-    assert not out['artboard'][1]['hasBackgroundColor']
-    test_color.check_color(out['artboard'][0]['backgroundColor'], 1, 0, 0, 1)
+    test_color.check_color(out['frames'][0]['style']['fills'][0]['color'], 1, 0, 0, 1)
+    assert len(out['frames'][1]['style']['fills']) == 0

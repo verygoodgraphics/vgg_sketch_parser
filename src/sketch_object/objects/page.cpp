@@ -34,7 +34,7 @@ size_t page::default_artboard_id_ = 1;
 
 page::page()
 {
-    init_child(this->child_, 0);
+    init_child(this->child_);
 }
 
 void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
@@ -62,7 +62,7 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
             if (name == "artboard")
             {
-                vgg["artboard"].emplace_back(std::move(out));
+                vgg["frames"].emplace_back(std::move(out));
                 default_artboard_mask.reset_mask();
             }
             // else if (name == "symbolMaster")
@@ -76,14 +76,14 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                     default_artboard.emplace(nlohmann::json::object());
                     page::create_default_artboard(*default_artboard);
 
-                    nlohmann::json layer;
-                    abstract_layer::create_default_layer(layer);
-                    (*default_artboard)["layers"].emplace_back(std::move(layer));
+                    // nlohmann::json layer;
+                    // abstract_layer::create_default_layer(layer);
+                    // (*default_artboard)["layers"].emplace_back(std::move(layer));
                 }
 
-                assert(default_artboard->at("layers").is_array());
-                assert(default_artboard->at("layers").size() == 1);
-                auto &layer = default_artboard->at("layers").front();
+                // assert(default_artboard->at("layers").is_array());
+                // assert(default_artboard->at("layers").size() == 1);
+                // auto &layer = default_artboard->at("layers").front();
 
                 auto &frame = out.at("frame");
                 rect child_rect(frame.at("x").get<double>(), frame.at("y").get<double>(), 
@@ -98,7 +98,7 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 }
                 
                 default_artboard_mask.deal_mask(*it->second, out);
-                layer["childObjects"].emplace_back(std::move(out));
+                (*default_artboard)["childObjects"].emplace_back(std::move(out));
             }
         }
         else 
@@ -111,25 +111,22 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     {
         //将 artboard 的起点置为 (0, 0)
         assert(default_artboard_rect);
-        double x = default_artboard_rect->x1_;
-        double y = default_artboard_rect->y1_;
-        default_artboard_rect->set(0, 0, default_artboard_rect->x2_ - x, default_artboard_rect->y2_ - y);
+        // double x = default_artboard_rect->x1_;
+        // double y = default_artboard_rect->y1_;
+        // default_artboard_rect->set(0, 0, default_artboard_rect->x2_ - x, default_artboard_rect->y2_ - y);
 
-        auto &layer = default_artboard->at("layers").front();
-        for (auto &item : layer.at("childObjects"))
-        {
-            item.at("frame").at("x") = item.at("frame").at("x").get<double>() - x;
-            item.at("frame").at("y") = item.at("frame").at("y").get<double>() - y;
-            item.at("matrix").at(4)  = item.at("matrix").at(4).get<double>() - x;
-            item.at("matrix").at(5)  = item.at("matrix").at(5).get<double>() - y;
-        }
+        // for (auto &item : default_artboard->at("childObjects"))
+        // {
+        //     item.at("frame").at("x") = item.at("frame").at("x").get<double>() - x;
+        //     item.at("frame").at("y") = item.at("frame").at("y").get<double>() - y;
+        //     item.at("matrix").at(4)  = item.at("matrix").at(4).get<double>() - x;
+        //     item.at("matrix").at(5)  = item.at("matrix").at(5).get<double>() - y;
+        // }
 
         rect_change::from_rect(*default_artboard_rect, (*default_artboard)["frame"]);
         (*default_artboard)["bounds"] = default_artboard->at("frame");
-        layer["frame"] = default_artboard->at("frame");
-        layer["bounds"] = default_artboard->at("frame");
 
-        vgg["artboard"].emplace_back(std::move(*default_artboard));
+        vgg["frames"].emplace_back(std::move(*default_artboard));
     }
 }
 
@@ -138,7 +135,7 @@ void page::create_default_artboard(nlohmann::json &out)
     out.clear();
 
     out["id"] = std::to_string(page::default_artboard_id_++);
-    out["name"] = string("artboard");
+    out["name"] = string("default-frame");
     out["isLocked"] = false;
     out["visible"] = true;
     context_settings_change::get_default(out["contextSettings"]);
@@ -149,9 +146,10 @@ void page::create_default_artboard(nlohmann::json &out)
     //out["isMask"] = false;
     out["maskType"] = 0;
 
-    out["class"] = "artboard";
-    out["hasBackgroundColor"] = false;
+    out["class"] = "frame";
+    //out["hasBackgroundColor"] = false;
 
     out["overflow"] = 1;
     out["styleEffectMaskArea"] = 0;    
+    out["childObjects"] = nlohmann::json::array();
 }

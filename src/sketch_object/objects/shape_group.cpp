@@ -29,7 +29,7 @@ t_child shape_group::child_;
 
 shape_group::shape_group()
 {
-    init_child(child_, 2);
+    init_child(child_);
 }
 
 void shape_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)

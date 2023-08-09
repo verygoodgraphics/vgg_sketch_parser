@@ -8,7 +8,7 @@ def check_context_settings(cs, blendMode, opacity, isolateBlending = False, tran
 
 def test_context_settings():
     out = analyze(f'{resource_path}/attr/context_settings.sketch')
-    objs = out['artboard'][0]['layers'][0]['childObjects']
+    objs = out['frames'][0]['childObjects']
 
     def get(obj):
         return (obj["style"]["fills"][0]["contextSettings"],
@@ -40,7 +40,7 @@ def test_context_settings():
     check_context_settings(global_cs, 3, 1)
 
     # blend-mode
-    objs = out['artboard'][1]['layers'][0]['childObjects']
+    objs = out['frames'][1]['childObjects']
     assert len(objs) == 18
     for x, y in zip(objs, range(len(objs))):
         assert x["contextSettings"]["blendMode"] == y

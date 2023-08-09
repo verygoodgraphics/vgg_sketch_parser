@@ -37,7 +37,7 @@ std::unordered_map<string, bool> symbol_master::override_switch_;
 
 symbol_master::symbol_master()
 {
-    init_child(this->child_, 1);
+    init_child(this->child_);
 }
 
 void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)

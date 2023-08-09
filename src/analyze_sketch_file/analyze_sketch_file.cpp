@@ -176,18 +176,11 @@ void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file
 
     //处理蒙版
     {
-        auto &artboards = json_out.at("artboard");
-        for (auto &item : artboards)
+        auto &frames = json_out.at("frames");
+        for (auto &item : frames)
         {
-            assert(item.at("layers").size() == 1);
-            mask::add_parent_mask_to_child(item.at("layers").at(0));
+            mask::add_parent_mask_to_child(item);
         }
-
-        // auto &symbol_masters = json_out.at("symbolMaster");
-        // for (auto &item : symbol_masters)
-        // {
-        //     mask::add_parent_mask_to_child(item);
-        // }
     }
 }
 
@@ -237,7 +230,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     json_out.clear();
     json_out["fileType"] = 1;
     json_out["fileName"] = string(name);
-    json_out["artboard"] = nlohmann::json::array();
+    json_out["frames"] = nlohmann::json::array();
     //json_out["symbolMaster"] = nlohmann::json::array();
 
     if (sketch_file_info.empty())

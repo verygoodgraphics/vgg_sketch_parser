@@ -9,7 +9,7 @@ def check_color_control_change(attr, isEnabled, brightness, contrast, hue, satur
 
 def test_color_control_change():
     out = analyze(f'{resource_path}/attr/color_control_change.sketch')
-    objs = out['artboard'][0]['layers'][0]['childObjects']    
+    objs = out['frames'][0]['childObjects']    
 
     check_color_control_change(objs[0]["imageAdjust"]["instance"],
                                True, 

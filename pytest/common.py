@@ -43,9 +43,8 @@ def create_collection(file_name):
     out = analyze(file_name)
 
     relation = {}
-    for artboard in out["artboard"]:
-        for layer in artboard["layers"]:
-            __collection(layer, relation)
+    for frame in out["frames"]:
+            __collection(frame, relation)
     
     return relation    
 
@@ -58,7 +57,7 @@ def __collection(obj, out):
 
     assert obj["name"] not in out
 
-    if obj["class"] != "layer":
+    if obj["class"] != "frame":
         out[obj["name"]] = obj
 
     if 'childObjects' in obj:

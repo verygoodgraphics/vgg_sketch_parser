@@ -29,7 +29,7 @@ t_child abstract_group::child_;
 
 abstract_group::abstract_group()
 {
-    init_child(child_, 2);
+    init_child(child_);
 }
 
 void abstract_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)

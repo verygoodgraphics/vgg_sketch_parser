@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include "./artboard.h"
 #include "src/sketch_object/attrs/color_change.h"
+#include "src/sketch_object/attrs/fill_change.h"
 #include "src/sketch_object/attrs/rect_change.h"
 #include "src/sketch_object/mask.h"
 #include "src/sketch_object/check.hpp"
@@ -32,7 +33,7 @@ t_child artboard::child_;
 
 artboard::artboard()
 {
-    init_child(this->child_, 1);
+    init_child(this->child_);
 }
 
 void artboard::change(const nlohmann::json &sketch, nlohmann::json &vgg)
@@ -44,26 +45,24 @@ void artboard::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     mask m_mask;
 
     assert(sketch.at("_class").get<string>() == "artboard");
-    vgg["class"] = "artboard";
-    vgg["hasBackgroundColor"] = get_json_value(sketch, "hasBackgroundColor", false);
+    vgg["class"] = "frame";
+    vgg["childObjects"] = nlohmann::json::array();
 
     try 
     {
-        auto it = sketch.find("backgroundColor");
-        if (it != sketch.end())
+        if (get_json_value(sketch, "hasBackgroundColor", false))
         {
-            color_change::change(*it, vgg["backgroundColor"]);
-        }
-        else if (vgg["hasBackgroundColor"].get<bool>())
-        {
-            //throw sketch_exception("fail to get artboard background color");
-            color_change::get_default(vgg["backgroundColor"]);
-            check::ins_.add_error("fail to get artboard background color");
-        }
-        
-        nlohmann::json vgg_layer;
-        abstract_layer::create_default_layer(vgg_layer);
+            auto it = sketch.find("backgroundColor");
+            if (it != sketch.end())
+            {
+                nlohmann::json color;
+                color_change::change(*it, color);
+                auto fill = fill_change::construct_from_color(std::move(color));
 
+                assert(vgg.at("style").at("fills").empty());
+                vgg.at("style").at("fills").emplace_back(std::move(fill));
+            }
+        }
         auto &layers = sketch.at("layers");
         for (auto &item : layers)
         {
@@ -78,7 +77,7 @@ void artboard::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 m_mask.deal_mask(*it->second, out);
 
                 assert(!out.empty());
-                vgg_layer["childObjects"].emplace_back(std::move(out));
+                vgg["childObjects"].emplace_back(std::move(out));
             }
             else 
             {
@@ -87,13 +86,9 @@ void artboard::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         }
 
         //artboard的起点固定为(0, 0)
-        vgg["frame"].at("x") = 0.0;
-        vgg["frame"].at("y") = 0.0;
-        rect_change::get_default_matrix(vgg["matrix"]);
-
-        vgg_layer["frame"] = vgg.at("frame");
-        vgg_layer["bounds"] = vgg.at("bounds");
-        vgg["layers"].emplace_back(std::move(vgg_layer));
+        // vgg["frame"].at("x") = 0.0;
+        // vgg["frame"].at("y") = 0.0;
+        // rect_change::get_default_matrix(vgg["matrix"]);
 
         /*
         sketch中未处理的属性包括: 

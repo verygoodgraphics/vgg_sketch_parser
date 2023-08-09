@@ -19,16 +19,16 @@ def check_color_override(obj, index, r, g, b, a, object_id, override_name):
 
 def test_symbol_master_num():
     out = analyze(f'{resource_root}/96/object/symbol/symbol_master_number.sketch')
-    assert len(out['artboard'][0]['layers'][0]['childObjects']) == 3
-    assert out['artboard'][0]['layers'][0]['childObjects'][0]['name'] == 'Master-Path'
-    assert out['artboard'][0]['layers'][0]['childObjects'][1]['name'] == 'Master-Image'
-    assert out['artboard'][0]['layers'][0]['childObjects'][2]['name'] == 'Master-Text'
+    assert len(out['frames'][0]['childObjects']) == 3
+    assert out['frames'][0]['childObjects'][0]['name'] == 'Master-Path'
+    assert out['frames'][0]['childObjects'][1]['name'] == 'Master-Image'
+    assert out['frames'][0]['childObjects'][2]['name'] == 'Master-Text'
 
 def test_symbol_position():
     out = analyze(f'{resource_root}/96/object/symbol/symbol_position.sketch')
-    assert len(out['artboard']) == 2
+    assert len(out['frames']) == 2
 
-    objs = out['artboard'][0]['layers'][0]['childObjects']
+    objs = out['frames'][0]['childObjects']
     assert len(objs) == 4
     assert objs[0]['name'] == 'instance_in_artboard'
     assert objs[0]['class'] == 'symbolInstance'
@@ -38,7 +38,7 @@ def test_symbol_position():
     assert objs[2]['childObjects'][0]['class'] == 'symbolInstance'
     assert objs[3]['name'] == 'Master_Nest'
     assert objs[3]['class'] == 'symbolInstance'
-    objs = out['artboard'][1]['layers'][0]['childObjects']
+    objs = out['frames'][1]['childObjects']
     assert len(objs) == 6
     assert objs[0]['name'] == 'Master-Path'
     assert objs[0]['class'] == 'symbolMaster'

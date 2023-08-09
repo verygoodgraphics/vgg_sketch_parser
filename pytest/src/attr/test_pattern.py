@@ -9,7 +9,7 @@ def check_pattern(pattern, fillType, imageFileName, matrix = [1, 0, 0, 1, 0, 0])
 
 def test_pattern():
     out = analyze(f'{resource_path}/attr/pattern.sketch')
-    objs = out['artboard'][0]['layers'][0]['childObjects']
+    objs = out['frames'][0]['childObjects']
 
     obj = objs[0]
     check_name(obj, "fill_with_opacity")

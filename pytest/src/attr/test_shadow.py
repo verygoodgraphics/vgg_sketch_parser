@@ -19,7 +19,7 @@ def check_shadow_basic(shadow, isEnabled, offsetX, offsetY, blur, spread, inner,
 
 def test_shadow():
     out = analyze(f'{resource_path}/attr/shadow.sketch')
-    objs = out['artboard'][0]['layers'][0]['childObjects']
+    objs = out['frames'][0]['childObjects']
 
     # zero shadow
     obj = objs[0]
@@ -55,7 +55,7 @@ def test_shadow():
 
 def test_inner_shadow():
     out = analyze(f'{resource_path}/attr/shadow_inner.sketch')
-    objs = out['artboard'][0]['layers'][0]['childObjects']
+    objs = out['frames'][0]['childObjects']
 
     # zero shadow
     obj = objs[0]

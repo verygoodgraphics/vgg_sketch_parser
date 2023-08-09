@@ -9,7 +9,7 @@ def collection_info(obj, out):
 
     assert obj["name"] not in out
 
-    if obj["class"] != "layer":
+    if obj["class"] != "frame":
         out[obj['name']] = (obj["id"], obj["outlineMaskBy"], obj["alphaMaskBy"], obj["maskType"])
 
     try:
@@ -52,9 +52,8 @@ def get_relation(file_name):
     out = analyze(file_name)
 
     relation = {}
-    for artboard in out["artboard"]:
-        for layer in artboard["layers"]:
-            collection_info(layer, relation)
+    for frame in out["frames"]:
+        collection_info(frame, relation)
     
     return relation
 

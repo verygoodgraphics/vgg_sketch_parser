@@ -13,7 +13,7 @@ def check_stops_basic(stop, position, midPoint):
 
 def test_gradient():
     out = analyze(f'{resource_path}/attr/gradient.sketch')
-    objs = out['artboard'][0]['layers'][0]['childObjects']
+    objs = out['frames'][0]['childObjects']
 
     obj = objs[0]
     check_name(obj, "line_opacity")

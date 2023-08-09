@@ -66,28 +66,12 @@ public:
      * @note 不会对 json_vgg 进行 clear
     */
     virtual void change(const nlohmann::json &sketch, nlohmann::json &vgg);
-
-public:
-    /**
-     * 创建默认的、符合 vgg-format 的 layer
-     * 
-     * @param vgg 保存输出的 json
-     * 
-     * @note 
-     * 会对 vgg 进行 clear
-     * frame bounds 不会被设置
-    */
-    static void create_default_layer(nlohmann::json &vgg);
 };
 
 //用于构建子项
 typedef map<string, unique_ptr<abstract_layer>> t_child;
 
-/**
- * 初始化子项
- * 
- * @param type 0: page, 1: artboard or symbol-master, 2:group
-*/
-void init_child(t_child &child, int type);
+// 初始化子项
+void init_child(t_child &child);
 
 #endif

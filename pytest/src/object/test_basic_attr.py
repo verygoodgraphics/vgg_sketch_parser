@@ -24,7 +24,7 @@ def test_basic_attr():
     out = analyze(f'{resource_path}/object/basic_attr.sketch')
     
     def get_objs(id):
-        return out['artboard'][id]['layers'][0]['childObjects']
+        return out['frames'][id]['childObjects']
         
     # id name
     def check(obj, id, name):
@@ -63,13 +63,13 @@ def test_basic_attr():
     check_isLocked(objs[3]['shape']['subshapes'][1]["subGeometry"], True)
 
     # bound frame matrix
-    def check(obj, frame_x, frame_y, bound_w, bound_h, matrix, frame_w = None, frame_h = None):
+    def check(obj, frame_x, frame_y, bound_w, bound_h, matrix, frame_w = None, frame_h = None, bound_x = 0, bound_y = 0):
         if frame_w is None:
             frame_w = bound_w
         if frame_h is None:
             frame_h = bound_h
 
-        check_rect(obj["bounds"], 0, 0, bound_w, bound_h)
+        check_rect(obj["bounds"], bound_x, bound_y, bound_w, bound_h)
         check_rect(obj["frame"], frame_x, frame_y, frame_w, frame_h)
         check_matrix(obj, matrix)
 
@@ -85,10 +85,10 @@ def test_basic_attr():
             y1 = b * x + d * y + ty
             return x1, y1
         
-        p0 = calc(0, 0)
-        p1 = calc(bound_w, 0)
-        p2 = calc(bound_w, -bound_h)
-        p3 = calc(0, -bound_h)
+        p0 = calc(bound_x, bound_y)
+        p1 = calc(bound_w + bound_x, bound_y)
+        p2 = calc(bound_w + bound_x, bound_y - bound_h)
+        p3 = calc(bound_x, bound_y - bound_h)
 
         x_calc = [p0[0], p1[0], p2[0], p3[0]]
         y_calc = [p0[1], p1[1], p2[1], p3[1]]
@@ -141,18 +141,18 @@ def test_basic_attr():
     # 备注: group shape_group 中两个图片的左上角的点的正确性, 通过手动计算保证过了, 只要上述验证满足, 其结果就是对的
 
     # defalut_artboard bound frame matrix
-    artboard_obj = out['artboard'][4]
-    check(artboard_obj, 0, 0, 1361.9999992684716, 843.9999990125989, [1, 0, 0, 1, 0, 0])
+    artboard_obj = out['frames'][4]
+    check(artboard_obj, -1180.9999992684716, -4077.000000987401, 1361.9999992684716, 
+          843.9999990125989, [1, 0, 0, 1, 0, 0], None, None, -1180.9999992684716, -4077.000000987401)
 
     objs = get_objs(4)
     check(objs[0]['childObjects'][0], 3.04439566889414e-07, -87.41446649146945, 482, 357, 
           [ 0.8660254082502548, -0.49999999226497954, 0.49999999226497954,
             0.8660254082502548, 178.49999754303727, -87.41446649146945 ],
             595.9242440152204, 550.171067017061)
-    check(objs[0], 0, 0, 785.9621223120497, 637.5855345755223, 
+    check(objs[0], -1180.9999992684716, -4077.000000987401, 785.9621223120497, 637.5855345755223, 
           [ -0.9848077535291953, -0.17364817473495014, -0.17364817473495014,
-            0.9848077535291953, 774.0215920331682, 0.0 ], 
+            0.9848077535291953, -406.9784072353034, -4077.000000987401 ], 
             884.7371563496151, 764.380065938326)
     # 备注: 图片左上角的二重变换, 手动验证过了, 只要上述验证满足, 其结果就是对的
-    
 

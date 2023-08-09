@@ -9,7 +9,7 @@ def check_color(color, r, g, b, a):
 def test_color():
     out = common.analyze(f'{common.resource_path}/attr/color.sketch')
 
-    objs = out["artboard"][0]["layers"][0]["childObjects"]
+    objs = out["frames"][0]["childObjects"]
 
     # 不含透明度的对象
     obj = objs[0]

@@ -10,7 +10,7 @@ def test_fill():
     out = analyze(f'{resource_path}/attr/fill.sketch')
 
     def get_objs(id):
-        return out['artboard'][id]['layers'][0]['childObjects']
+        return out['frames'][id]['childObjects']
 
     def get_fill(obj, fill_id):
         return obj["style"]["fills"][fill_id]

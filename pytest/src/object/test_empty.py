@@ -5,5 +5,5 @@ def test_artboard():
     out = analyze(f'{resource_path}/object/empty.sketch')
 
     assert out['fileType'] == 1
-    assert not out['artboard']
+    assert not out['frames']
     #assert not out['symbolMaster']

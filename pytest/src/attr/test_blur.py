@@ -22,7 +22,7 @@ def check_blur(blur, type, isEnabled, center, saturation, radius = None, motionA
 
 def test_blur():
     out = analyze(f'{resource_path}/attr/blur.sketch')
-    objs = out['artboard'][0]['layers'][0]['childObjects']
+    objs = out['frames'][0]['childObjects']
 
     def check(id, name, type, isEnabled, center, saturation, radius = None, motionAngle = None):
         check_name(objs[id], name)
