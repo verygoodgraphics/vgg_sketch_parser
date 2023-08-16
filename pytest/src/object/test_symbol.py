@@ -102,7 +102,7 @@ def check_allow_override_on_and_every_item_on(file_name):
                          'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.shadows.3.color')  
     check_color_override(obj, 6, 0, 0, 1, 0.5,
                          'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.shadows.2.color')  
-    check_override_value(obj, 7, 'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.fills.2.pattern.imageFileName',
+    check_override_value(obj, 7, 'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.fills.2.pattern.instance.imageFileName',
                  'resources/4e3a88994fb339824d20deaa85ebf1bad7d7b46f.png')
 
     obj = out['page1_master_image']['overrideValues']
@@ -146,7 +146,7 @@ def check_allow_override_on_and_every_item_on(file_name):
     obj = out['page1_Master_Nest_change_3_attr']['overrideValues']
     assert len(obj) == 3
     check_override_value(obj, 0, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'double change')
-    check_override_value(obj, 1, 'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.fills.2.pattern.imageFileName', 'resources/4e3a88994fb339824d20deaa85ebf1bad7d7b46f.png')
+    check_override_value(obj, 1, 'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.fills.2.pattern.instance.imageFileName', 'resources/4e3a88994fb339824d20deaa85ebf1bad7d7b46f.png')
     check_color_override(obj, 2, 0, 1, 0, 1, '31757F0E-A99C-447D-BE5C-BF84EC724F0B', 'style.fills.0.color')
 
     obj = out['page1_Master_Nest_change_text_content_and_symbol']['overrideValues']

@@ -301,7 +301,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                         {
                             if (it->at("fillType").get<int>() == 2 && it->at("isEnabled").get<bool>())
                             {
-                                auto override_name = string("style.fills.") + std::to_string(now_obj_fills.size() - index - 1) + string(".pattern.imageFileName");
+                                auto override_name = string("style.fills.") + std::to_string(now_obj_fills.size() - index - 1) + string(".pattern.instance.imageFileName");
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
                                     ids.back(), override_name, bitmap_filename));                                
                                 break;
