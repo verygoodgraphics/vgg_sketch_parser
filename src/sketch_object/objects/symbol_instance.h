@@ -47,7 +47,7 @@ private:
     // 对象收集
     static void collection_objs(const nlohmann::json &obj);
 
-    static nlohmann::json create_override_value(const string &obj_id, 
+    static nlohmann::json create_override_value(const vector<string> &obj_id, 
         const string &override_name, nlohmann::json &&override_value);
 
 private:

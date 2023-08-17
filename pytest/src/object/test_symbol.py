@@ -8,13 +8,25 @@ def check_override_value(obj, index, object_id, override_name, override_value):
         check_float_equal(attr['overrideValue'], override_value)
     else:
         assert attr['overrideValue'] == override_value
-    assert attr['objectId'] == object_id
+
+    if isinstance(object_id, list):
+        assert attr['objectId'] == object_id
+    else:
+        assert len(attr['objectId']) == 1
+        assert attr['objectId'][0] == object_id
+
     assert attr['overrideName'] == override_name
 
 def check_color_override(obj, index, r, g, b, a, object_id, override_name):
     attr = obj[index]
     test_color.check_color(attr['overrideValue'], r, g, b, a)
-    assert attr['objectId'] == object_id
+
+    if isinstance(object_id, list):
+        assert attr['objectId'] == object_id
+    else:
+        assert len(attr['objectId']) == 1
+        assert attr['objectId'][0] == object_id
+
     assert attr['overrideName'] == override_name
 
 def test_symbol_master_num():
@@ -145,44 +157,44 @@ def check_allow_override_on_and_every_item_on(file_name):
 
     obj = out['page1_Master_Nest_change_3_attr']['overrideValues']
     assert len(obj) == 3
-    check_override_value(obj, 0, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'double change')
-    check_override_value(obj, 1, 'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.fills.2.pattern.instance.imageFileName', 'resources/4e3a88994fb339824d20deaa85ebf1bad7d7b46f.png')
+    check_override_value(obj, 0, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'content', 'double change')
+    check_override_value(obj, 1, ['651675C7-452D-48D3-A84A-A6CF6796E3B3', 'FB099C6B-9E82-43D9-84EE-909F6D602498'], 'style.fills.2.pattern.instance.imageFileName', 'resources/4e3a88994fb339824d20deaa85ebf1bad7d7b46f.png')
     check_color_override(obj, 2, 0, 1, 0, 1, '31757F0E-A99C-447D-BE5C-BF84EC724F0B', 'style.fills.0.color')
-
+   
     obj = out['page1_Master_Nest_change_text_content_and_symbol']['overrideValues']
     assert len(obj) == 6
-    check_override_value(obj, 0, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'hello world1')
-    check_override_value(obj, 1, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'content', 'hello 2')
-    check_override_value(obj, 2, '985FEC76-D8E5-4EBF-B119-F26E367F7BC6', 'content', 'hello 3')
+    check_override_value(obj, 0, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'content', 'hello world1')
+    check_override_value(obj, 1, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', 'F052DA2D-69E8-4F54-AB92-F19335E9486F'], 'content', 'hello 2')
+    check_override_value(obj, 2, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '985FEC76-D8E5-4EBF-B119-F26E367F7BC6'], 'content', 'hello 3')
     check_color_override(obj, 3, 0, 0, 1, 0.5, '31757F0E-A99C-447D-BE5C-BF84EC724F0B', 'style.fills.0.color')
     check_override_value(obj, 4, '651675C7-452D-48D3-A84A-A6CF6796E3B3', 'masterId', 'E6687A9D-5F3C-49F7-90BB-F19DBC9A956C')
-    check_override_value(obj, 5, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'symbol-change')
+    check_override_value(obj, 5, ['651675C7-452D-48D3-A84A-A6CF6796E3B3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'content', 'symbol-change')
     
     obj = out['page1_master_nest_change_symbol_and_image']['overrideValues']
     check_override_value(obj, 0, '651675C7-452D-48D3-A84A-A6CF6796E3B3', 'masterId', '87621494-BE66-4837-9F83-EE3D6390C1D6')
-    check_override_value(obj, 1, 'A5C629DE-9983-48B6-94B6-3C08557C841F', 'imageFileName', 'resources/4e3a88994fb339824d20deaa85ebf1bad7d7b46f.png')
+    check_override_value(obj, 1, ['651675C7-452D-48D3-A84A-A6CF6796E3B3', 'A5C629DE-9983-48B6-94B6-3C08557C841F'], 'imageFileName', 'resources/4e3a88994fb339824d20deaa85ebf1bad7d7b46f.png')
 
     obj = out['Master_Nest_change_fill_color_and_text_size_color']['overrideValues']
     assert len(obj) == 4
-    check_override_value(obj, 0, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.size', 30)
-    check_color_override(obj, 1, 1, 0, 0, 1, 'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.fills.3.color')
-    check_color_override(obj, 2, 1, 0, 0, 0.8, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.fills.*.color')
+    check_override_value(obj, 0, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'attr.*.size', 30)
+    check_color_override(obj, 1, 1, 0, 0, 1, ['651675C7-452D-48D3-A84A-A6CF6796E3B3', 'FB099C6B-9E82-43D9-84EE-909F6D602498'], 'style.fills.3.color')
+    check_color_override(obj, 2, 1, 0, 0, 0.8, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'attr.*.fills.*.color')
     check_color_override(obj, 3, 0, 1, 0, 1, '31757F0E-A99C-447D-BE5C-BF84EC724F0B', 'style.fills.0.color')
 
     obj = out['page1_Master_Nest_Double_change_color']['overrideValues']
     check_color_override(obj, 0, 0, 1, 1, 1, '77077B65-EB8F-4D66-A533-44224D8720C7', 'style.fills.0.color')
-    check_color_override(obj, 1, 1, 0, 1, 0.5, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'attr.*.fills.*.color')
-    check_color_override(obj, 2, 1, 0, 0, 1, '985FEC76-D8E5-4EBF-B119-F26E367F7BC6', 'attr.*.fills.*.color')
+    check_color_override(obj, 1, 1, 0, 1, 0.5, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', 'F052DA2D-69E8-4F54-AB92-F19335E9486F'], 'attr.*.fills.*.color')
+    check_color_override(obj, 2, 1, 0, 0, 1, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '985FEC76-D8E5-4EBF-B119-F26E367F7BC6'], 'attr.*.fills.*.color')
 
     obj = out['Master_Nest_Double_change_symbol_and_color']['overrideValues']
-    check_override_value(obj, 0, '651675C7-452D-48D3-A84A-A6CF6796E3B3', 'masterId', 'E6687A9D-5F3C-49F7-90BB-F19DBC9A956C')
+    check_override_value(obj, 0, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '651675C7-452D-48D3-A84A-A6CF6796E3B3'], 'masterId', 'E6687A9D-5F3C-49F7-90BB-F19DBC9A956C')
     check_color_override(obj, 1, 0, 0, 0, 1, '77077B65-EB8F-4D66-A533-44224D8720C7', 'style.fills.0.color')
-    check_color_override(obj, 2, 1, 0, 1, 1, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.fills.*.color')
+    check_color_override(obj, 2, 1, 0, 1, 1, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '651675C7-452D-48D3-A84A-A6CF6796E3B3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'attr.*.fills.*.color')
 
     obj = out['page1_Master_Nest_Triple_change_symbol_and_color_and_text']['overrideValues']
-    check_override_value(obj, 0, '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', 'masterId', '59B5C63E-4B01-4D1F-8D5B-459FE06E638C')
-    check_color_override(obj, 1, 0, 0, 0, 1, 'FB099C6B-9E82-43D9-84EE-909F6D602498', 'style.fills.3.color')
-    check_override_value(obj, 2, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'happy life')
+    check_override_value(obj, 0, ['74FC2703-A058-442A-941B-54990FADFAB5', 'D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3'], 'masterId', '59B5C63E-4B01-4D1F-8D5B-459FE06E638C')
+    check_color_override(obj, 1, 0, 0, 0, 1, ['74FC2703-A058-442A-941B-54990FADFAB5', 'D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', 'FB099C6B-9E82-43D9-84EE-909F6D602498'], 'style.fills.3.color')
+    check_override_value(obj, 2, ['74FC2703-A058-442A-941B-54990FADFAB5', 'D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '651675C7-452D-48D3-A84A-A6CF6796E3B3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'content', 'happy life')
 
 def test_allow_override_on_and_every_item_on():
     check_allow_override_on_and_every_item_on(f'{resource_root}/96/object/symbol/allow_override_on_and_every_item_on.sketch')
@@ -219,7 +231,6 @@ def test_symbol_mask():
     test_mask.judge(relation, 'page1_instance_be_masked', ['page1_instance_as_mask'], [], 0)
     test_mask.judge(relation, 'page1_instance_ignore_mask', [], [], 0)
 
-
 def test_88_1_allow_override_on_and_every_item_on():
     out = create_collection(f'{resource_root}/88_1/object/symbol/allow_override_on_and_every_item_on.sketch')
 
@@ -251,7 +262,7 @@ def test_88_1_allow_override_on_and_every_item_on():
     check_override_value(obj, 0, 'F0E0CB99-09A6-4299-BD9C-289BD68D9D78',
                          'masterId', 
                          'A2DBFC7E-97AF-411F-B3F8-2C6DBCAF24F2')    
-    check_override_value(obj, 1, 'B65FED22-13D9-4EEF-9A1F-258D897A5602',
+    check_override_value(obj, 1, ['F0E0CB99-09A6-4299-BD9C-289BD68D9D78', 'B65FED22-13D9-4EEF-9A1F-258D897A5602'],
                          'content', 
                          'double')  
     

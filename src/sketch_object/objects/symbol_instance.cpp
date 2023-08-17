@@ -30,7 +30,6 @@ SOFTWARE.
 #include "boost/algorithm/string.hpp"
 #include <string_view>
 #include <optional>
-#include <deque>
 
 std::unordered_map<string, const nlohmann::json*> symbol_instance::objs_;
 
@@ -151,7 +150,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
         if (!master->include_background_color_in_instance_ && !master->master_data_.at("style").at("fills").empty())
         {
             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                obj["masterId"], "style.fills", nlohmann::json::array()));
+                { obj["masterId"] }, "style.fills", nlohmann::json::array()));
         }
 
         if (!master->allow_override_)
@@ -196,7 +195,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                 string obj_id(name.begin(), pos);
                 const nlohmann::json *now_obj = nullptr;
 
-                std::deque<string> ids;
+                vector<string> ids;
                 boost::split(ids, obj_id, [](const char value){ return value == '/'; });
                 if (ids.empty())
                 {
@@ -277,7 +276,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
 
                     override_name += (string(".") + std::to_string(index) + string(".color"));
                     obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                        ids.back(), override_name, std::move(color)));
+                        ids, override_name, std::move(color)));
                 }
                 else if (boost::starts_with(sv, "_image"))
                 {
@@ -288,7 +287,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                     {
                         // 此时, sketch 无法覆盖 image 的 fill 的 pattern
                         obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                            ids.back(), "imageFileName", bitmap_filename));
+                            ids, "imageFileName", bitmap_filename));
 
                         // szn todo 当图像自身存在 fill 时, 进行图像内容覆盖, 产生的行为难以捉摸, 暂不处理
                     }
@@ -303,7 +302,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                             {
                                 auto override_name = string("style.fills.") + std::to_string(now_obj_fills.size() - index - 1) + string(".pattern.instance.imageFileName");
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids.back(), override_name, bitmap_filename));                                
+                                    ids, override_name, bitmap_filename));                                
                                 break;
                             }
 
@@ -318,12 +317,12 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                         if (boost::starts_with(sv, "_stringValue"))
                         {
                             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                ids.back(), "content", std::move(value)));
+                                ids, "content", std::move(value)));
                         }
                         else if (boost::starts_with(sv, "_textSize"))
                         {
                             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                ids.back(), "attr.*.size", strtof(value.get<string>().c_str(), nullptr)));
+                                ids, "attr.*.size", strtof(value.get<string>().c_str(), nullptr)));
                         }
                         else if (boost::starts_with(sv, "_textDecoration"))
                         {
@@ -331,18 +330,18 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                             if (str == "underline")
                             {
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids.back(), "attr.*.underline", 1));
+                                    ids, "attr.*.underline", 1));
 
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids.back(), "attr.*.linethrough", false));                                
+                                    ids, "attr.*.linethrough", false));                                
                             }
                             else if (str == "strikethrough")
                             {
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids.back(), "attr.*.underline", 0));
+                                    ids, "attr.*.underline", 0));
 
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids.back(), "attr.*.linethrough", true));    
+                                    ids, "attr.*.linethrough", true));    
                             }                                         
                         }                    
                         else if (boost::starts_with(sv, "_textHAlign"))
@@ -369,7 +368,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                             }
 
                             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                ids.back(), "attr.*.horizontalAlignment", horizon));
+                                ids, "attr.*.horizontalAlignment", horizon));
                         }
                     }
                     else if (boost::starts_with(sv, "_textColor"))
@@ -378,7 +377,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                         color_change::change(value, color);
 
                         obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                            ids.back(), "attr.*.fills.*.color", std::move(color)));
+                            ids, "attr.*.fills.*.color", std::move(color)));
                     }
                     else if (boost::starts_with(sv, "_textWeight"))
                     {
@@ -392,7 +391,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                     if (it != symbol_master::get_master().end())
                     {
                         obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                            ids.back(), "masterId", nlohmann::json(it->second->master_data_.at("id"))));                        
+                            ids, "masterId", nlohmann::json(it->second->master_data_.at("id"))));                        
                     }
                     else
                     {
@@ -413,12 +412,18 @@ void symbol_instance::override_attr(nlohmann::json &obj)
     }
 }
 
-nlohmann::json symbol_instance::create_override_value(const string &obj_id,
+nlohmann::json symbol_instance::create_override_value(const vector<string> &obj_id,
     const string &override_name, nlohmann::json &&override_value)
 {
     nlohmann::json out;
     out["class"] = string("overrideValue");
-    out["objectId"] = obj_id;
+    
+    out["objectId"] = nlohmann::json::array();
+    for (auto &item : obj_id)
+    {
+        out["objectId"].emplace_back(item);
+    }
+
     out["overrideName"] = override_name;
     out["overrideValue"] = std::move(override_value);
     return out;
