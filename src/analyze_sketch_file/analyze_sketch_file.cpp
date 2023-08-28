@@ -184,6 +184,55 @@ void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file
     }
 }
 
+nlohmann::json analyze_sketch_file::deal_document(const extract::t_extract_result &sketch_file_info)
+{
+    nlohmann::json out = nlohmann::json::array();
+
+    auto it = sketch_file_info.find(extract::_document_file_name);
+    if (it == sketch_file_info.end())
+    {
+        check::ins_.add_error("failed to open document.json");
+        return out;
+    }
+
+    nlohmann::json document_json;
+
+    try 
+    {
+        document_json = nlohmann::json::parse(it->second.begin(), it->second.end());
+    }
+    catch(...)
+    {
+        assert(false);
+        return out;
+    }
+
+    auto it_foreign_symbols = document_json.find("foreignSymbols");
+    if (it_foreign_symbols == document_json.end())
+    {
+        return out;
+    }
+
+    symbol_master master;
+    for (auto &item : *it_foreign_symbols)
+    {
+        auto it = item.find("symbolMaster");
+        if (it == item.end() || get_json_value(*it, "_class", std::string("")) != "symbolMaster")
+        {
+            assert(false);
+            continue;
+        }
+        else 
+        {
+            nlohmann::json tmp;
+            master.change(*it, tmp);
+            out.emplace_back(std::move(tmp));
+        }
+    }
+
+    return out;
+}
+
 bool analyze_sketch_file::analyze(const void* content, const size_t len,
     const char* name, nlohmann::json &json_out, map<string, vector<char>> &out_file)
 {
@@ -232,6 +281,8 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     json_out["fileName"] = string(name);
     json_out["frames"] = nlohmann::json::array();
     //json_out["symbolMaster"] = nlohmann::json::array();
+
+    json_out["innerObjects"] = analyze_sketch_file::deal_document(sketch_file_info);
 
     if (sketch_file_info.empty())
     {

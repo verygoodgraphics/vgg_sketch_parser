@@ -120,6 +120,18 @@ private:
         nlohmann::json &json_out
     );
 
+    /**
+     * 处理 document.json
+     * 
+     * @param sketch_file_info sketch file
+     * 
+     * @return vgg-format.innerObject 的值, 即一个 array
+    */
+    static nlohmann::json deal_document
+    (
+        const extract::t_extract_result& sketch_file_info
+    );
+
 // private:
 //     static optional<valijson::Schema> _document_schema;
 //     static optional<valijson::Schema> _meta_schema;

@@ -65,8 +65,9 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 color_change::change(*it, color);
                 auto fill = fill_change::construct_from_color(std::move(color));
 
-                assert(vgg.at("style").at("fills").empty());
-                vgg.at("style").at("fills").emplace_back(std::move(fill));
+                // 备注: 遇到过一个 master 具有 background 的同时, 还具有 fill
+                // assert(vgg.at("style").at("fills").empty());
+                vgg.at("style").at("fills").insert(vgg.at("style").at("fills").begin(), std::move(fill));
             }
         }
 

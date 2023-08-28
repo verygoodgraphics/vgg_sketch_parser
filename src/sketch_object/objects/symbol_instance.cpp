@@ -83,27 +83,37 @@ void symbol_instance::collection_objs(const nlohmann::json &obj)
 void symbol_instance::deal_override_attr(nlohmann::json &vgg_format)
 {
     symbol_instance::objs_.clear();
+    const string attrs[] = { "frames", "innerObjects" };
 
     // 复制一份, 防止迭代器失效
     // const auto objs = vgg_format;
-    for (auto &frame : vgg_format.at("frames"))
+    for (auto &attr : attrs)
     {
-        symbol_instance::collection_objs(frame);
-    }
-
-    for (auto &frame : vgg_format.at("frames"))
-    {
-        symbol_instance::recursive_deal(frame, symbol_instance::override_attr);
-    }
-
-    for (auto &frame : vgg_format.at("frames"))
-    {
-        symbol_instance::recursive_deal(frame, [](nlohmann::json &obj)
+        for (auto &item : vgg_format.at(attr))
         {
-            assert(obj.at("class") == "symbolInstance");
-            assert(obj.find("original_info") != obj.end());
-            obj.erase("original_info");                
-        });
+            symbol_instance::collection_objs(item);
+        }        
+    }
+
+    for (auto &attr : attrs)
+    {
+        for (auto &item : vgg_format.at(attr))
+        {
+            symbol_instance::recursive_deal(item, symbol_instance::override_attr);
+        }        
+    }
+
+    for (auto &attr : attrs)
+    {
+        for (auto &item : vgg_format.at(attr))
+        {
+            symbol_instance::recursive_deal(item, [](nlohmann::json &obj)
+            {
+                assert(obj.at("class") == "symbolInstance");
+                assert(obj.find("original_info") != obj.end());
+                obj.erase("original_info");                
+            });
+        }
     }
 }
 
@@ -142,7 +152,14 @@ void symbol_instance::override_attr(nlohmann::json &obj)
 
     try 
     {
-        auto &master = symbol_master::get_master().at(sketch.at("symbolID"));
+        auto it_master = symbol_master::get_master().find(sketch.at("symbolID"));
+        if (it_master == symbol_master::get_master().end())
+        {
+            check::ins_.add_error("Failed to get the master associated with the instance");
+            return;
+        }
+
+        auto &master = it_master->second;
 
         obj["masterId"] = master->master_data_.at("id");
         obj["overrideValues"] = nlohmann::json::array();
@@ -210,7 +227,8 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                 }
                 else 
                 {
-                    check::ins_.add_error("failed to get master object.");
+                    // 备注: 遇到过一个文件, 会进入此处, 且对应的对象确实不存在
+                    // check::ins_.add_error("failed to get master object.");
                     continue;
                 }
 
@@ -395,11 +413,18 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                     }
                     else
                     {
-                        check::ins_.add_error("when override symbol, failed to get master");
+                        // 备注: 有一个文件能进到此处, 其 override value 为空
+                        // check::ins_.add_error("when override symbol, failed to get master");
                     }
                 }
                 else 
                 {
+                    if (boost::starts_with(sv, "_layerStyle"))
+                    {
+                        // szn todo
+                        continue;
+                    }
+
                     assert(false);
                     check::ins_.add_error("Unhandled property overrides");
                 }
