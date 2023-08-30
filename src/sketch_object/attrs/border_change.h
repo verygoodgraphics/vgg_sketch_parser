@@ -36,8 +36,6 @@ public:
      * @param sketch_border sketch border
      * @param sketch_border_option sketch border option, 可以为 nullptr
      * @param vgg 符合 vgg-format 的输出
-     * @param bound_width bound 的 宽度
-     * @param bound_height bound 的 高度
      * 
      * @exception sketch_exception
      * 
@@ -47,10 +45,7 @@ public:
     (
         const nlohmann::json &sketch_border, 
         const nlohmann::json *sketch_border_option, 
-        nlohmann::json &vgg,
-
-        double bound_width, 
-        double bound_height
+        nlohmann::json &vgg
     );
 
 public:

@@ -36,8 +36,6 @@ public:
      * @param sketch sketch 的输入
      * @param vgg 符合 vgg-format 的输出
      * @param context_setting 从 sketch 中解析出的 context setting
-     * @param bound_width bound 的 宽度
-     * @param bound_height bound 的 高度
      * 
      * @exception sketch_exception
      * 
@@ -47,10 +45,7 @@ public:
     (
         const nlohmann::json &sketch, 
         nlohmann::json &vgg, 
-        nlohmann::json &context_setting,
-
-        double bound_width,
-        double bound_height
+        nlohmann::json &context_setting
     );
 
     /**

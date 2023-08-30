@@ -32,7 +32,7 @@ SOFTWARE.
 #include "src/basic/get_json_value.hpp"
 #include <fstream>
 
-void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, double bound_width, double bound_height)
+void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     vgg.clear();
 
@@ -66,7 +66,7 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, doub
             it = sketch.find("gradient");
             if (it != sketch.end())
             {
-                gradient_change::change(sketch.at("gradient"), vgg["gradient"], bound_width, bound_height);
+                gradient_change::change(sketch.at("gradient"), vgg["gradient"]);
             }
             else if (1 == fill_type) 
             {

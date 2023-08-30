@@ -30,8 +30,7 @@ SOFTWARE.
 #include "src/sketch_object/attrs/context_settings_change.h"
 #include "src/basic/get_json_value.hpp"
 
-void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlohmann::json &context_setting,
-    double bound_width, double bound_height)
+void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlohmann::json &context_setting)
 {
     vgg.clear();
 
@@ -75,7 +74,7 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
             for (auto &item : *it)
             {
                 nlohmann::json tem;
-                border_change::change(item, border_option, tem, bound_width, bound_height);
+                border_change::change(item, border_option, tem);
                 
                 assert(tem.find("miterLimit") != tem.end());
                 if (sketch.find("miterLimit") != sketch.end())
@@ -103,13 +102,13 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
                 {
                     for (auto &item : *it)
                     {
-                        fill_change::change(item, out, bound_width, bound_height);
+                        fill_change::change(item, out);
                         vgg["fills"].emplace_back(std::move(out));
                     }
                 }
                 else
                 {
-                    fill_change::change(*it, out, bound_width, bound_height);
+                    fill_change::change(*it, out);
                     vgg["fills"].emplace_back(std::move(out));
                 }
             }

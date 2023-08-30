@@ -83,7 +83,7 @@ void symbol_instance::collection_objs(const nlohmann::json &obj)
 void symbol_instance::deal_override_attr(nlohmann::json &vgg_format)
 {
     symbol_instance::objs_.clear();
-    const string attrs[] = { "frames", "innerObjects" };
+    const string attrs[] = { "frames", "references" };
 
     // 复制一份, 防止迭代器失效
     // const auto objs = vgg_format;
@@ -417,14 +417,14 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                         // check::ins_.add_error("when override symbol, failed to get master");
                     }
                 }
+                else if (boost::starts_with(sv, "_layerStyle"))
+                {
+                    obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
+                        ids, "style", nlohmann::json(string("referenced_style_") + value.get<string>())));
+                }
                 else 
                 {
-                    if (boost::starts_with(sv, "_layerStyle"))
-                    {
-                        // szn todo
-                        continue;
-                    }
-
+                    // szn todo _fillColor
                     assert(false);
                     check::ins_.add_error("Unhandled property overrides");
                 }

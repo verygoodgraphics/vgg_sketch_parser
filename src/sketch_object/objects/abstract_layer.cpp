@@ -108,9 +108,7 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         }
         else 
         {
-            style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"], 
-                vgg["bounds"].at("width").get<double>(), 
-                vgg["bounds"].at("height").get<double>());
+            style_change::change(sketch.at("style"), vgg["style"], vgg["contextSettings"]);
         }
 
         /*

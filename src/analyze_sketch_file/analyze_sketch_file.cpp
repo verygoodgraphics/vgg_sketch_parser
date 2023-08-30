@@ -31,6 +31,7 @@ SOFTWARE.
 #include "src/sketch_object/check.hpp"
 #include "src/sketch_object/objects/symbol_master.h"
 #include "src/sketch_object/objects/symbol_instance.h"
+#include "src/sketch_object/attrs/style_change.h"
 
 check check::ins_;
 const char* analyze_sketch_file::_image_dir_name = "resources";
@@ -208,25 +209,76 @@ nlohmann::json analyze_sketch_file::deal_document(const extract::t_extract_resul
     }
 
     auto it_foreign_symbols = document_json.find("foreignSymbols");
-    if (it_foreign_symbols == document_json.end())
+    if (it_foreign_symbols != document_json.end())
     {
-        return out;
+        symbol_master master;
+        for (auto &item : *it_foreign_symbols)
+        {
+            auto it = item.find("symbolMaster");
+            if (it == item.end() || get_json_value(*it, "_class", std::string("")) != "symbolMaster")
+            {
+                assert(false);
+                continue;
+            }
+            else 
+            {
+                nlohmann::json tmp;
+                master.change(*it, tmp);
+                out.emplace_back(std::move(tmp));
+            }
+        }
     }
 
-    symbol_master master;
-    for (auto &item : *it_foreign_symbols)
+    auto add_ref_style = [&out](const nlohmann::json &obj, bool nest)
     {
-        auto it = item.find("symbolMaster");
-        if (it == item.end() || get_json_value(*it, "_class", std::string("")) != "symbolMaster")
+        try 
         {
-            assert(false);
-            continue;
+            nlohmann::json ref_style;
+            ref_style["class"] = "referencedStyle";
+
+            if (nest)
+            {
+                ref_style["id"] = obj.at("localSharedStyle").at("do_objectID");
+                style_change::change(obj.at("localSharedStyle").at("value"), ref_style["style"], ref_style["contextSettings"]);
+            }
+            else 
+            {
+                ref_style["id"] = obj.at("do_objectID");
+                style_change::change(obj.at("value"), ref_style["style"], ref_style["contextSettings"]);
+            }
+
+            out.emplace_back(std::move(ref_style));
         }
-        else 
+        catch(...)
         {
-            nlohmann::json tmp;
-            master.change(*it, tmp);
-            out.emplace_back(std::move(tmp));
+            check::ins_.add_error("failed to change shared style");
+        }
+    };
+
+    {
+        string names[] = { "foreignLayerStyles", "foreignTextStyles" };
+        for (auto &name : names)
+        {
+            for (auto &obj : document_json.value(name, nlohmann::json::array()))
+            {
+                add_ref_style(obj, true);
+            }
+        }
+    }
+    {
+        string names[] = { "layerStyles", "layerTextStyles" };
+        for (auto &name : names)
+        {
+            try 
+            {
+                for (auto &obj : document_json.at(name).at("objects"))
+                {
+                    add_ref_style(obj, false);
+                }
+            }
+            catch(...)
+            {
+            }
         }
     }
 
@@ -282,7 +334,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     json_out["frames"] = nlohmann::json::array();
     //json_out["symbolMaster"] = nlohmann::json::array();
 
-    json_out["innerObjects"] = analyze_sketch_file::deal_document(sketch_file_info);
+    json_out["references"] = analyze_sketch_file::deal_document(sketch_file_info);
 
     if (sketch_file_info.empty())
     {
@@ -294,6 +346,6 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     analyze_sketch_file::deal_meta(sketch_file_info, vec_page_file_path);
     analyze_sketch_file::deal_page(sketch_file_info, vec_page_file_path, json_out);
     symbol_instance::deal_override_attr(json_out);
-    
+
     return check::ins_.get_error().empty();
 }
