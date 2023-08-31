@@ -112,8 +112,11 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 // 手动修改 from 和 to
                 gradient["from"][0] = 0.5;
                 gradient["from"][1] = 0.5;
+                
+                // 备注: 此处 to 的 x 不重要, 固定设为 1
                 //gradient["to"][0] = bound_width >= bound_height ? 1.0 : (bound_height / bound_width);
-                //gradient["to"][1] = 0.5;
+                gradient["to"][0] = 1.0;
+                gradient["to"][1] = 0.5;
                 break;
             }
             
