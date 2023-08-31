@@ -388,6 +388,18 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
                                 ids, "attr.*.horizontalAlignment", horizon));
                         }
+                        else if (boost::starts_with(sv, "_textStyle"))
+                        {
+                            obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
+                                ids, "style", nlohmann::json(string("referenced_style_") + value.get<string>())));
+
+                            // szn todo 文本属性未覆盖
+                        }
+                        else 
+                        {
+                            assert(false);
+                            check::ins_.add_error("Unhandled text property overrides (string)");
+                        }                          
                     }
                     else if (boost::starts_with(sv, "_textColor"))
                     {
@@ -401,6 +413,11 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                     {
                         // szn todo 暂时不知道如何解析
                     }
+                    else 
+                    {
+                        assert(false);
+                        check::ins_.add_error("Unhandled text property overrides");
+                    }                    
                 }
                 else if (boost::starts_with(sv, "_symbolID"))
                 {

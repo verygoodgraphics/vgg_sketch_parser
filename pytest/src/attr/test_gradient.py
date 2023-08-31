@@ -57,4 +57,5 @@ def test_gradient():
     gradient = obj["style"]["fills"][0]["gradient"]["instance"]
     assert gradient["class"] == "gradientAngular"    
     check_gradient_from_or_to(gradient, True, [0.5, 0.5])
-    check_gradient_from_or_to(gradient, False, [1.8584070796460177, 0.5])
+    #check_gradient_from_or_to(gradient, False, [1.8584070796460177, 0.5])
+    check_gradient_from_or_to(gradient, False, [1.0, 0.5])

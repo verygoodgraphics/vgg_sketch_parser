@@ -231,6 +231,79 @@ def test_symbol_mask():
     test_mask.judge(relation, 'page1_instance_be_masked', ['page1_instance_as_mask'], [], 0)
     test_mask.judge(relation, 'page1_instance_ignore_mask', [], [], 0)
 
+def test_layer_style():
+    out = create_collection(f'{resource_root}/96/object/symbol/layerStyle.sketch')
+
+    obj = out['ins_rect_no_change']['overrideValues']
+    assert not obj
+
+    obj = out['ins_rect_change_two_color']['overrideValues']
+    assert len(obj) == 2 
+    check_color_override(obj, 0, 0, 0, 1, 0.5, ['6D67C953-AB4E-47DB-9CDC-30EE282D69B0'], 'style.fills.1.color')
+    check_color_override(obj, 1, 1, 0, 1, 0.5, ['6D67C953-AB4E-47DB-9CDC-30EE282D69B0'], 'style.fills.0.color')
+
+    obj = out['ins_round_rect_no_change']['overrideValues']
+    check_override_value(obj, 0, ['A081F952-2746-44ED-A442-2A6A5704489D'], 'style.fills', [])
+
+    obj = out['ins_round_rect_change_one_color']['overrideValues']
+    check_override_value(obj, 0, ['A081F952-2746-44ED-A442-2A6A5704489D'], 'style.fills', [])
+    check_color_override(obj, 1, 0, 0, 0, 0.5, ['B4874969-3965-4036-96C0-FF61C9038E17'], 'style.fills.0.color')
+
+    obj = out['ins_oval_change_layerStyle']['overrideValues']
+    check_override_value(obj, 0, ['8905A07C-C9F1-4DE1-AD7D-96FA184FB15B'], 'style', 'referenced_style_DBE84A11-1415-4356-9640-FDB6EBCE398B')
+
+    obj = out['ins_oval_change_layerStyle_fillcolor']['overrideValues']
+    check_override_value(obj, 0, ['8905A07C-C9F1-4DE1-AD7D-96FA184FB15B'], 'style', 'referenced_style_DBE84A11-1415-4356-9640-FDB6EBCE398B')
+    check_color_override(obj, 1, 0.43937787203959, 0.7971014492753623, 0.504418522446094, 0.5, ['8905A07C-C9F1-4DE1-AD7D-96FA184FB15B'], 'style.fills.1.color')
+
+    obj = out['ins_oval_change_layerStyle_contextSettings']['overrideValues']
+    check_override_value(obj, 0, ['8905A07C-C9F1-4DE1-AD7D-96FA184FB15B'], 'style', 'referenced_style_DBE84A11-1415-4356-9640-FDB6EBCE398B')
+
+    obj = out['ins_oval_change_layerStyle_contextSettings_fillcolor']['overrideValues']
+    check_override_value(obj, 0, ['8905A07C-C9F1-4DE1-AD7D-96FA184FB15B'], 'style', 'referenced_style_DBE84A11-1415-4356-9640-FDB6EBCE398B')
+    check_color_override(obj, 1, 0.2544361965358785, 0.855072463768116, 0.2880382254719476, 0.5, ['8905A07C-C9F1-4DE1-AD7D-96FA184FB15B'], 'style.fills.1.color')
+
+    obj = out['ins_star_no_change']['overrideValues']
+    assert not obj
+
+    obj = out['ins_star_change_layerStyle']['overrideValues']
+    assert not obj
+
+def test_foreign_layer_style():
+    out = create_collection(f'{resource_root}/96/object/symbol/foreign_layer_style.sketch')
+
+    obj = out['ins_change_layerStyle']['overrideValues']
+    check_override_value(obj, 0, ['603D9000-FE01-41F2-860D-A76FBD662A45'], 'style', 'referenced_style_0E4F4A2E-CAD7-41DA-9A6E-A513ECD2F063')
+
+    obj = out['ins_change_layerStyle_fillColor']['overrideValues']
+    check_override_value(obj, 0, ['603D9000-FE01-41F2-860D-A76FBD662A45'], 'style', 'referenced_style_0E4F4A2E-CAD7-41DA-9A6E-A513ECD2F063')
+    check_color_override(obj, 1, 0.1538461538461533, 0, 1, 1, ['603D9000-FE01-41F2-860D-A76FBD662A45'], 'style.fills.0.color')
+
+def test_text_style():
+    out = create_collection(f'{resource_root}/96/object/symbol/text_style.sketch')
+    
+    obj = out['ins_abc_no_change']['overrideValues']
+    assert not obj
+
+    obj = out['ins_abc_change_fontStyle']['overrideValues']
+    check_override_value(obj, 0, ['E7DB9A58-925B-4436-896C-A822AE2E5AFB'], 'style', 'referenced_style_11FA00F1-D94D-4287-806E-7FE60FCCF61E')
+
+    obj = out['ins_abc_change_fontStyle_fillColor']['overrideValues']
+    check_override_value(obj, 0, ['E7DB9A58-925B-4436-896C-A822AE2E5AFB'], 'style', 'referenced_style_11FA00F1-D94D-4287-806E-7FE60FCCF61E')
+    check_color_override(obj, 1, 0.02797202797202836, 0, 1, 1, ['E7DB9A58-925B-4436-896C-A822AE2E5AFB'], 'attr.*.fills.*.color')
+
+    obj = out['ins_xyz_change_fontStyle_fillColor']['overrideValues']
+    check_color_override(obj, 0, 0.3195903071830961, 0.01410392364793214, 0.9637681159420289, 1, ['12C8E737-5398-410E-BA75-8C951ED68499'], 'attr.*.fills.*.color')
+
+def test_foreign_text_style():
+    out = create_collection(f'{resource_root}/96/object/symbol/foreign_text_style.sketch')
+    
+    obj = out['ins_abc_change_fontStyle']['overrideValues']
+    check_override_value(obj, 0, ['E7DB9A58-925B-4436-896C-A822AE2E5AFB'], 'style', 'referenced_style_BD05AD7A-2540-4A03-80C3-2A967C2C1806')
+
+    obj = out['ins_abc_change_fontStyle_1']['overrideValues']
+    check_override_value(obj, 0, ['E7DB9A58-925B-4436-896C-A822AE2E5AFB'], 'style', 'referenced_style_D3418EAE-334D-4528-A2E9-EC34A0A9583A')
+
 def test_88_1_allow_override_on_and_every_item_on():
     out = create_collection(f'{resource_root}/88_1/object/symbol/allow_override_on_and_every_item_on.sketch')
 
