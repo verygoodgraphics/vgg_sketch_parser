@@ -24,8 +24,10 @@ SOFTWARE.
 
 #include "./symbol_instance.h"
 #include "./symbol_master.h"
+#include "./bitmap.h"
+#include "./document.h"
+#include "./text.h"
 #include "src/sketch_object/attrs/color_change.h"
-#include "src/sketch_object/objects/bitmap.h"
 #include "src/sketch_object/check.hpp"
 #include "boost/algorithm/string.hpp"
 #include <string_view>
@@ -393,7 +395,8 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
                                 ids, "style", nlohmann::json(string("referenced_style_") + value.get<string>())));
 
-                            // szn todo 文本属性未覆盖
+                            obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
+                                ids, "verticalAlignment", nlohmann::json(document::get_text_vertical_align(value.get<string>()))));
                         }
                         else 
                         {
