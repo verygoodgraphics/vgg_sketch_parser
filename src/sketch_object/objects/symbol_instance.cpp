@@ -445,6 +445,8 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                 }
                 else if (boost::starts_with(sv, "_fillColor"))
                 {
+                    // group tint
+                    
                     nlohmann::json color;
                     color_change::change(value, color);    
 
