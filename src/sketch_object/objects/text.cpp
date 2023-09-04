@@ -184,7 +184,7 @@ nlohmann::json text::create_font_attr(const nlohmann::json &sketch)
     out["horizontalAlignment"] = text::change_text_horizontal_alignment(sketch);
     out.update(text::change_text_name_size(sketch));
     out["letterSpacing"] = text::change_text_letter_spacing(sketch);
-    out["lineSpace"] = text::change_text_line_spacing(sketch);
+    out["lineSpace"] = text::change_text_line_spacing(sketch, out["size"].get<double>());
     out["textParagraph"] = text::change_text_paragraph(sketch);
     out.update(text::get_fixed_attr());
 
@@ -275,11 +275,11 @@ double text::change_text_letter_spacing(const nlohmann::json &sketch)
     return 0.0;
 }
 
-double text::change_text_line_spacing(const nlohmann::json &sketch)
+double text::change_text_line_spacing(const nlohmann::json &sketch, double font_size)
 {
-    //该值为默认值
-    // szn todo 该默认值应该与字号有关 待研究
-    double result = 24.0;
+    // 1.25 这个值源于测试
+    // 对于字号 14 的结果是 18, 对于字号 6 的结果是 7, 说明 sketch 在 XX.5 上策略不一致, 此处将忽略这种细微的情况
+    double result = round(font_size * 1.25);
 
     // 经测试, sketch 中 调整行距会使得 maximumLineHeight minimumLineHeight 为同一值
     try 
