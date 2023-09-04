@@ -22,42 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef bd_sketch_style_change
-#define bd_sketch_style_change
-#include "src/basic/define.h"
+#ifndef bd_sketch_document
+#define bd_sketch_document
 #include "nlohmann/json.hpp"
+#include <unordered_map>
+#include <string>
 
-class style_change
+using std::string;
+using std::unordered_map;
+
+class document
 {
 public:
-    /**
-     * 将 sketch 的输入, 转为符合 vgg-format 的输出
-     * 
-     * @param sketch sketch 的输入
-     * @param vgg 符合 vgg-format 的输出
-     * @param context_setting 从 sketch 中解析出的 context setting
-     * @param text_style 
-     *  若该项非空, 则将 style.textStyle 的转换结果保存到该值中, 
-     *  若最终 *text_style == nlohmann::json() 则表示未提取到有效信息
-     * 
-     * @exception sketch_exception
-     * 
-     * @note 会对 vgg 先进行 clear
-    */
-    static void change
-    (
-        const nlohmann::json &sketch, 
-        nlohmann::json &vgg, 
-        nlohmann::json &context_setting,
-        nlohmann::json *text_style = nullptr
-    );
+    static nlohmann::json change(const nlohmann::json &sketch);
 
-    /**
-     * 获取默认的 style
-     * 
-     * @param out 保存默认的 style
-    */
-    static void get_default(nlohmann::json &out);
+    // 根据 vgg-format.references.id 获取其 verticalAlignment
+    static int get_text_vertical_align(const string &ref_id);
+
+private:
+    // <vgg-format.references.id, vgg-format.text.verticalAlignment>
+    // 用于 symbol-instance 的 override
+    static unordered_map<string, int> text_vertical_align_;
 };
 
 #endif

@@ -44,7 +44,7 @@ def create_collection(file_name):
 
     relation = {}
     for frame in out["frames"]:
-            __collection(frame, relation)
+        __collection(frame, relation)
     
     return relation    
 

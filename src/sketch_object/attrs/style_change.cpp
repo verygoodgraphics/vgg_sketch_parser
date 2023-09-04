@@ -29,8 +29,10 @@ SOFTWARE.
 #include "src/sketch_object/attrs/shadow_change.h"
 #include "src/sketch_object/attrs/context_settings_change.h"
 #include "src/basic/get_json_value.hpp"
+#include "src/sketch_object/objects/text.h"
+#include "src/sketch_object/check.hpp"
 
-void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlohmann::json &context_setting)
+void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlohmann::json &context_setting, nlohmann::json *text_style)
 {
     vgg.clear();
 
@@ -148,12 +150,30 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
         item["endMarkerType"] = end_marker_type;
     }
 
+    do
+    {
+        if (!text_style)
+        {
+            break;
+        }
+        
+        auto it = sketch.find("textStyle");
+
+        // 备注: 大部分属性存在于 textStyle.encodedAttributes 中
+        if (it == sketch.end() || it->find("encodedAttributes") == it->end())
+        {
+            *text_style = nlohmann::json();
+            break;
+        }
+        
+        *text_style = text::create_font_attr(it->at("encodedAttributes"));
+    } while (false);
+
     /*
     备注: 未处理的项包括
     do_objectID
     */
 
-    //textStyle: 在 text.cpp 中被处理了
     //windingRule: 在 abstract_shapp.cpp 中被处理了
 }
 
