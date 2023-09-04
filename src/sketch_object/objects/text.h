@@ -52,7 +52,7 @@ private:
     static double change_text_letter_spacing(const nlohmann::json &sketch);
 
     // 提取 font-attr.lineSpace
-    static double change_text_line_spacing(const nlohmann::json &sketch);
+    static double change_text_line_spacing(const nlohmann::json &sketch, double font_size);
 
     // 提取 font-attr.underline
     static int change_text_underline(const nlohmann::json &sketch);
