@@ -26,6 +26,7 @@ SOFTWARE.
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/sketch_object/attrs/context_settings_change.h"
 #include "src/sketch_object/check.hpp"
+#include "src/sketch_object/attrs/fill_change.h"
 
 void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
@@ -212,16 +213,8 @@ nlohmann::json text::change_text_color(const nlohmann::json &sketch)
         color_change::get_default(color);
     }
 
-    //脏代码
-    nlohmann::json fill;
-    fill["class"] = "fill";
-    fill["isEnabled"] = true;
-    fill["fillType"] = 0;
-    fill["color"] = std::move(color);
-    context_settings_change::get_default(fill["contextSettings"]);
-
     nlohmann::json out;
-    out.emplace_back(std::move(fill));
+    out.emplace_back(fill_change::construct_from_color(std::move(color)));
     return out;
 }
 

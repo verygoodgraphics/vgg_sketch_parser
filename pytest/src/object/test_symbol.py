@@ -2,12 +2,14 @@
 import src.attr.test_color as test_color
 import src.object.test_mask as test_mask
 
-def check_override_value(obj, index, object_id, override_name, override_value):
+def check_override_value(obj, index, object_id, override_name, override_value = None):
     attr = obj[index]
-    if isinstance(attr['overrideValue'], float):
-        check_float_equal(attr['overrideValue'], override_value)
-    else:
-        assert attr['overrideValue'] == override_value
+
+    if override_value is not None:
+        if isinstance(attr['overrideValue'], float):
+            check_float_equal(attr['overrideValue'], override_value)
+        else:
+            assert attr['overrideValue'] == override_value
 
     if isinstance(object_id, list):
         assert attr['objectId'] == object_id
@@ -352,6 +354,21 @@ def test_foreign_text_style():
 
     obj = out['ins_xyz_change_textStyle']['overrideValues']
     assert not obj
+
+def test_group_tint():
+    out = create_collection(f'{resource_root}/96/object/symbol/group_tint.sketch')
+    
+    obj = out['ins_a_change_group_tint_shadow_color']['overrideValues']
+    assert len(obj) == 2
+    check_override_value(obj, 0, ['8AF9B558-6B13-4551-A16B-9A740182869E'], 'style.fills', None)
+    test_color.check_color(obj[0]['overrideValue'][0]['color'], 0.9565217391304348, 0.8847377436985073, 0.02332979851537648, 1)
+    check_color_override(obj, 1, 0.8188405797101449, 0.2486549152508856, 0.223683280311064, 1, 
+                         '8AF9B558-6B13-4551-A16B-9A740182869E', 'style.shadows.0.color')    
+
+    obj = out['ins_b_change_group_tint_shadow_color']['overrideValues']
+    assert len(obj) == 1
+    check_color_override(obj, 0, 0.02797202797202836, 0, 1, 1, 
+                         '18312955-5762-4B3B-BFEC-3DD8972C9E5E', 'style.shadows.0.color')    
 
 def test_88_1_allow_override_on_and_every_item_on():
     out = create_collection(f'{resource_root}/88_1/object/symbol/allow_override_on_and_every_item_on.sketch')
