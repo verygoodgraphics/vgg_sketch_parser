@@ -30,6 +30,7 @@ SOFTWARE.
 #include "src/sketch_object/attrs/color_change.h"
 #include "src/sketch_object/check.hpp"
 #include "boost/algorithm/string.hpp"
+#include "src/sketch_object/attrs/fill_change.h"
 #include <string_view>
 #include <optional>
 
@@ -442,9 +443,17 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                     obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
                         ids, "style", nlohmann::json(string("referenced_style_") + value.get<string>())));
                 }
+                else if (boost::starts_with(sv, "_fillColor"))
+                {
+                    nlohmann::json color;
+                    color_change::change(value, color);    
+
+                    nlohmann::json fills = nlohmann::json::array();
+                    fills.emplace_back(fill_change::construct_from_color(std::move(color)));
+                    obj["overrideValues"].emplace_back(symbol_instance::create_override_value(ids, "style.fills", std::move(fills)));                              
+                }
                 else 
                 {
-                    // szn todo _fillColor
                     assert(false);
                     check::ins_.add_error("Unhandled property overrides");
                 }
