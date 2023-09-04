@@ -60,27 +60,29 @@ nlohmann::json document::change(const nlohmann::json &sketch)
 
     auto add_ref_style = [&out](const nlohmann::json &obj, bool nest)
     {
+        auto p_obj = &obj;
+
         try 
         {
-            nlohmann::json ref_style;
-            ref_style["class"] = "referencedStyle";
-
             if (nest)
             {
-                ref_style["id"] = obj.at("localSharedStyle").at("do_objectID");
-                style_change::change(obj.at("localSharedStyle").at("value"), ref_style["style"], ref_style["contextSettings"], &ref_style["fontAttr"]);
-                document::text_vertical_align_[ref_style["id"].get<string>()] = text::chagne_vertical_alignment(obj.at("localSharedStyle").at("value").at("textStyle"));
-            }
-            else 
-            {
-                ref_style["id"] = obj.at("do_objectID");
-                style_change::change(obj.at("value"), ref_style["style"], ref_style["contextSettings"], &ref_style["fontAttr"]);
-                document::text_vertical_align_[ref_style["id"].get<string>()] = text::chagne_vertical_alignment(obj.at("value").at("textStyle"));
+                p_obj = &obj.at("localSharedStyle");
             }
 
+            nlohmann::json ref_style;
+            ref_style["class"] = "referencedStyle";
+            ref_style["id"] = p_obj->at("do_objectID");
+            
+            style_change::change(p_obj->at("value"), ref_style["style"], ref_style["contextSettings"], &ref_style["fontAttr"]);
             if (ref_style["fontAttr"] == nlohmann::json())
             {
                 ref_style.erase("fontAttr");
+            }
+
+            auto it = p_obj->at("value").find("textStyle");
+            if (it != p_obj->at("value").end())
+            {
+                document::text_vertical_align_[ref_style["id"].get<string>()] = text::chagne_vertical_alignment(*it);
             }
 
             out.emplace_back(std::move(ref_style));
