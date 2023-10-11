@@ -2,7 +2,8 @@
 import jsonschema
 import json
 
-resource_root = 'D:/work/data/sketch/pytest'
+
+resource_root = 'C:/work/res/data/sketch/pytest'
 #resource_path = f'{resource_root}/88_1'
 resource_path = f'{resource_root}/96'
 

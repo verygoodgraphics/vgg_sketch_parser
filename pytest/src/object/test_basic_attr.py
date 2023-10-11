@@ -1,4 +1,4 @@
-﻿from common import check_float_equal, check_name, analyze, resource_path
+﻿from common import check_float_equal, check_name, analyze, resource_path, create_collection
 
 def check_id(obj, value):
     assert obj["id"] == value
@@ -156,3 +156,24 @@ def test_basic_attr():
             884.7371563496151, 764.380065938326)
     # 备注: 图片左上角的二重变换, 手动验证过了, 只要上述验证满足, 其结果就是对的
 
+def test_constraint():
+    relation = create_collection(f'{resource_path}/object/constraint.sketch')
+
+    def check(name, is_check_h, value):
+        assert relation[name]["horizontalConstraint" if is_check_h else "verticalConstraint"] == value
+    
+    check('h_no_set', True, 5)
+    check('h_only_fix_h', True, 6)
+    check('h_only_pin_left', True, 2)
+    check('h_only_pin_right', True, 4)
+    check('h_pin_left_right', True, 0)
+    check('h_pin_left_fix_h', True, 1)
+    check('h_pin_right_fix_h', True, 3)
+
+    check('v_no_set', False, 5)
+    check('v_only_fix_v', False, 6)
+    check('v_only_pin_top', False, 2)
+    check('v_only_pin_bottom', False, 4)
+    check('v_pin_top_bottom', False, 0)
+    check('v_pin_top_fix_v', False, 1)
+    check('v_pin_bottom_fix_v', False, 3)

@@ -139,6 +139,60 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         vgg["overflow"] = get_json_value(sketch, "presentationStyle", 0) + 1;
         vgg["styleEffectMaskArea"] = 0;
 
+        auto it = sketch.find("resizingConstraint");
+        if (it != sketch.end())
+        {
+            unsigned char constraint = it->get<unsigned char>();
+
+            bool is_set_left = !(constraint & 4);
+            bool is_set_top = !(constraint & 32);
+            bool is_set_right = !(constraint & 1);
+            bool is_set_bottom = !(constraint & 8);
+            bool is_fix_h = !(constraint & 2);
+            bool is_fix_v = !(constraint & 16);
+
+            auto calc_constraint = [](bool is_set_start, bool is_set_end, bool is_fix)
+            {
+                if (is_set_start)
+                {
+                    if (is_set_end)
+                    {
+                        return 0;
+                    }
+                    else if (is_fix)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return 2;
+                    }
+                }
+                else if (is_set_end)
+                {
+                    if (is_fix)
+                    {
+                        return 3;
+                    }
+                    else
+                    {
+                        return 4;
+                    }
+                }
+                else if (!is_fix)
+                {
+                    return 5;
+                }
+                else
+                {
+                    return 6;
+                }
+            };
+            
+            vgg["horizontalConstraint"] = calc_constraint(is_set_left, is_set_right, is_fix_h);
+            vgg["verticalConstraint"] = calc_constraint(is_set_top, is_set_bottom, is_fix_v);
+        }
+
         /*
         未处理的项:
         exportOptions
@@ -147,7 +201,6 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         isTemplate
         layerListExpandedType
         nameIsFixed
-        resizingConstraint
         resizingType
         sharedStyleID
         userInfo
