@@ -120,7 +120,6 @@ void symbol_master::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         sketch中未处理的属性包括:
         includeBackgroundColorInExport
         isFlowHome
-        resizesContent
         presetDictionary
         */
     }

@@ -193,6 +193,12 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             vgg["verticalConstraint"] = calc_constraint(is_set_top, is_set_bottom, is_fix_v);
         }
 
+        it = sketch.find("resizesContent");
+        if (it != sketch.end())
+        {
+            vgg["resizesContent"]= it->get<bool>() ? 2 : 1;
+        }
+
         /*
         未处理的项:
         exportOptions
