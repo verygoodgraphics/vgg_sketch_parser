@@ -47,6 +47,7 @@ void shape_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         int winding_rule = get_json_value(sketch, "windingRule", 1);
         check::ins_.check_range(winding_rule, 0, 1, 1, "invalid winding rule");
         shape["windingRule"] = winding_rule;
+        shape["subshapes"] = nlohmann::json::array();
 
         auto &layers = sketch.at("layers");
         for (auto &item : layers)
