@@ -96,11 +96,11 @@ private:
      * 
      * @exception sketch_exception
     */
-    static void deal_meta
-    (
-        const extract::t_extract_result& sketch_file_info,
-        std::vector<string> &vec_page_file_name
-    );
+    // static void deal_meta
+    // (
+    //     const extract::t_extract_result& sketch_file_info,
+    //     std::vector<string> &vec_page_file_name
+    // );
 
     /**
      * 处理 page 文件
@@ -124,12 +124,14 @@ private:
      * 处理 document.json
      * 
      * @param sketch_file_info sketch file
+     * @param vec_page_file_name 解析出的 page 的文件名
      * 
      * @return vgg-format.innerObject 的值, 即一个 array
     */
     static nlohmann::json deal_document
     (
-        const extract::t_extract_result& sketch_file_info
+        const extract::t_extract_result& sketch_file_info,
+        std::vector<string> &vec_page_file_name
     );
 
 // private:
