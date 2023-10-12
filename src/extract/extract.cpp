@@ -25,9 +25,9 @@ SOFTWARE.
 #include "./extract.h"
 
 const string extract::_document_file_name = "document.json";
-const string extract::_meta_file_name = "meta.json";
+//const string extract::_meta_file_name = "meta.json";
 const string extract::_user_file_name = "user.json";
-const string extract::_pages_dir_name = "pages";
+//const string extract::_pages_dir_name = "pages";
 const string extract::_images_dir_name = "images";
 
 void extract::set_file(const char* content, const size_t len, t_extract_result &result)
@@ -88,6 +88,6 @@ void extract::set_file(const char* content, const size_t len, t_extract_result &
     }
 
     assert(result.find(extract::_document_file_name) != result.end());
-    assert(result.find(extract::_meta_file_name) != result.end());
+    //assert(result.find(extract::_meta_file_name) != result.end());
     assert(result.find(extract::_user_file_name) != result.end());
 }

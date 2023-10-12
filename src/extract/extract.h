@@ -52,9 +52,9 @@ public:
 
 public:
     static const string _document_file_name;
-    static const string _meta_file_name;
+    //static const string _meta_file_name;
     static const string _user_file_name;
-    static const string _pages_dir_name;
+    //static const string _pages_dir_name;
     static const string _images_dir_name;
 };
 

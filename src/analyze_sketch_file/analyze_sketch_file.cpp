@@ -106,7 +106,7 @@ bool analyze_sketch_file::json_schema_validate(const valijson::Schema &schema, c
 }
 */
 
-void analyze_sketch_file::deal_meta(const extract::t_extract_result& sketch_file_info, 
+/*void analyze_sketch_file::deal_meta(const extract::t_extract_result& sketch_file_info, 
     std::vector<string> &vec_page_file_name)
 {
     vec_page_file_name.clear();
@@ -146,7 +146,7 @@ void analyze_sketch_file::deal_meta(const extract::t_extract_result& sketch_file
         string str = (boost::format("fail to analyze %1%") % extract::_meta_file_name).str();
         throw sketch_exception(str.c_str());
     }
-}
+}*/
 
 void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file_info,
     const std::vector<string> &vec_page_file_name, nlohmann::json &json_out)
@@ -186,7 +186,7 @@ void analyze_sketch_file::deal_page(const extract::t_extract_result &sketch_file
     }
 }
 
-nlohmann::json analyze_sketch_file::deal_document(const extract::t_extract_result &sketch_file_info)
+nlohmann::json analyze_sketch_file::deal_document(const extract::t_extract_result &sketch_file_info, std::vector<string> &vec_page_file_name)
 {
     auto it = sketch_file_info.find(extract::_document_file_name);
     if (it == sketch_file_info.end())
@@ -205,6 +205,20 @@ nlohmann::json analyze_sketch_file::deal_document(const extract::t_extract_resul
     {
         assert(false);
         return nlohmann::json::array();
+    }
+
+    try 
+    {
+        auto &page_info = document_json.at("pages");
+        for (auto &item : page_info)
+        {
+            vec_page_file_name.emplace_back((boost::format("%1%.json") % item.at("_ref").get<string>()).str());
+        }
+    }
+    catch(...)
+    {
+        string str = (boost::format("fail to analyze %1%") % extract::_document_file_name).str();
+        throw sketch_exception(str.c_str());
     }
 
     return document::change(document_json);
@@ -259,7 +273,8 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     json_out["frames"] = nlohmann::json::array();
     //json_out["symbolMaster"] = nlohmann::json::array();
 
-    json_out["references"] = analyze_sketch_file::deal_document(sketch_file_info);
+    vector<string> vec_page_file_path;
+    json_out["references"] = analyze_sketch_file::deal_document(sketch_file_info, vec_page_file_path);
 
     if (sketch_file_info.empty())
     {
@@ -267,8 +282,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
         return true;
     }
 
-    vector<string> vec_page_file_path;
-    analyze_sketch_file::deal_meta(sketch_file_info, vec_page_file_path);
+    //analyze_sketch_file::deal_meta(sketch_file_info, vec_page_file_path);
     analyze_sketch_file::deal_page(sketch_file_info, vec_page_file_path, json_out);
     symbol_instance::deal_override_attr(json_out);
 
