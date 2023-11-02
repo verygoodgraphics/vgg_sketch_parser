@@ -32,6 +32,7 @@ void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     assert(sketch.at("_class").get<string>() == "text");
     abstract_layer::change(sketch, vgg);
+    vgg["keepShapeWhenResize"] = true;
 
     try
     {

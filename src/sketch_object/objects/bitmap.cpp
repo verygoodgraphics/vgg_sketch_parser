@@ -35,7 +35,8 @@ void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 
     vgg["class"] = string("image");
     vgg["fillReplacesImage"] = get_json_value(sketch, "fillReplacesImage", false);
-    
+    vgg["keepShapeWhenResize"] = true;
+
     try 
     {
         string file_name;

@@ -129,7 +129,6 @@ void abstract_shape::curve_point_change(const nlohmann::json &sketch_points,
             assert(item.at("_class").get<string>() == "curvePoint");
 
             point["class"] = string("pointAttr");
-            point["radius"] = get_json_value(item, "cornerRadius", 0.0);
 
             auto it = item.find("cornerStyle");
             if (it != item.end())
@@ -139,16 +138,26 @@ void abstract_shape::curve_point_change(const nlohmann::json &sketch_points,
                 point["cornerStyle"] = corner_style;
             }
 
+            // sketch 中, 若一个点有 curve from 或 curve to, 则该点的 radius 不生效, 所以进行手动忽略
+            bool ignore_radius = false;
+
             if (get_json_value(item, "hasCurveFrom", false))
             {
                 add_point(x, y, width, height, item.at("curveFrom"), tem);
                 point["curveFrom"] = std::move(tem);
+                ignore_radius = true;
             }
 
             if (get_json_value(item, "hasCurveTo", false))
             {
                 add_point(x, y, width, height, item.at("curveTo"), tem);
                 point["curveTo"] = std::move(tem);
+                ignore_radius = true;
+            }
+
+            if (!ignore_radius)
+            {
+                point["radius"] = get_json_value(item, "cornerRadius", 0.0);
             }
 
             add_point(x, y, width, height, item.at("point"), tem);
