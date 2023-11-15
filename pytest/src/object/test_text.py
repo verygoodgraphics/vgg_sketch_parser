@@ -37,10 +37,10 @@ def test_text():
     test_color.check_color(fill_1["color"], 0.9565217391304348, 0, 0, 1)
     check_attr_item('a4_font_color', 'length', [4, 5])    
 
-    check_attr_item('a5_character', 'letterSpacing', [50, 0])
+    check_attr_item('a5_character', 'letterSpacingValue', [50, 0])
     check_attr_item('a5_character', 'length', [4, 5])
 
-    check_attr_item('a6_line', 'lineSpace', [50, 100, 200])
+    check_attr_item('a6_line', 'lineSpaceValue', [50, 100, 200])
     check_attr_item('a6_line', 'length', [11, 11, 21])
 
     def check_paragraphSpacing(name, attr_value):
@@ -151,10 +151,10 @@ def test_text():
     check_attr_item('b4_down', 'baselineShift', [-4, 0])
     check_attr_item('b4_down', 'length', [4, 5])    
 
-    check_attr_item('a_33_upper', 'lettertransform', [2, 0])
+    check_attr_item('a_33_upper', 'textCase', [1, 0])
     check_attr_item('a_33_upper', 'length', [4, 5])      
 
-    check_attr_item('a_34_lower', 'lettertransform', [3, 0])
+    check_attr_item('a_34_lower', 'textCase', [2, 0])
     check_attr_item('a_34_lower', 'length', [4, 5])   
 
     assert relation["a_35_list_type"]["content"] == "\t1.\tsomething1\n\t2.\tsomething2\n\t3.\tsomething3\n\t4.\tsomething4"
@@ -163,8 +163,8 @@ def test_text():
     check_attr_item('a_38_through', 'linethrough', [True, False])
     check_attr_item('b3_raise', 'length', [4, 5])
 
-    check_attr_item('a_39_not_menu_change', 'lettertransform', [2, 0])
+    check_attr_item('a_39_not_menu_change', 'textCase', [1, 0])
     check_attr_item('a_39_not_menu_change', 'length', [4, 5])
 
-    check_attr_item('a_40_not_menu_change', 'lettertransform', [3, 0])
+    check_attr_item('a_40_not_menu_change', 'textCase', [2, 0])
     check_attr_item('a_40_not_menu_change', 'length', [4, 5])

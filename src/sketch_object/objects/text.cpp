@@ -185,15 +185,15 @@ nlohmann::json text::create_font_attr(const nlohmann::json &sketch)
     out["fills"] = text::change_text_color(sketch);
     out["horizontalAlignment"] = text::change_text_horizontal_alignment(sketch);
     out.update(text::change_text_name_size(sketch));
-    out["letterSpacing"] = text::change_text_letter_spacing(sketch);
-    out["lineSpace"] = text::change_text_line_spacing(sketch, out["size"].get<double>());
+    out["letterSpacingValue"] = text::change_text_letter_spacing(sketch);
+    out["lineSpaceValue"] = text::change_text_line_spacing(sketch, out["size"].get<double>());
     out["textParagraph"] = text::change_text_paragraph(sketch);
     out.update(text::get_fixed_attr());
 
     //不在 sketch-schema 中描述的一些属性, 来自测试总结
     out["underline"] = text::change_text_underline(sketch);
     out["linethrough"] = text::change_text_line_through(sketch);
-    out["lettertransform"] = text::change_text_letter_transform(sketch);
+    out["textCase"] = text::change_text_letter_transform(sketch);
     out["baselineShift"] = text::change_text_baseline_shift(sketch);
     out["baseline"] = text::change_text_baseline(sketch);   
 
@@ -333,7 +333,7 @@ int text::change_text_letter_transform(const nlohmann::json &sketch)
 
         if (result == 1 || result == 2)
         {
-            ++result;
+            //++result;
         }
         else if (result != 0)
         {
