@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     if (!std::filesystem::is_directory(output_dir))
     {
-        printf("error: invalid input directory\n");
+        printf("error: invalid output directory\n");
         return -1;
     }
 

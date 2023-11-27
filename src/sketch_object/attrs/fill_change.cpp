@@ -82,29 +82,38 @@ void fill_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         {
             nlohmann::json pattern;
             pattern["class"] = "pattern";
-            
             auto &instance = pattern["instance"];
-            instance["class"] = string("patternImage");
 
+            static const char* names[] = 
+            {
+                "patternImageTile",
+                "patternImageFill",
+                "patternImageStretch",
+                "patternImageFit"
+            };
             int pattern_fill_type = get_json_value(sketch, "patternFillType", 0);
             check::ins_.check_range(pattern_fill_type, 0, 3, 0, "invalid pattern fill type");
-            instance["fillType"] = pattern_fill_type;
+            instance["class"] = names[pattern_fill_type];
 
-            instance["imageTileMirrored"] = false;
-            //instance["imageTileScale"] = get_json_value(sketch, "patternTileScale", 1.0);
-
-            double scale = get_json_value(sketch, "patternTileScale", 1.0);
-            instance["matrix"] = nlohmann::json::array();
-            if (0 != pattern_fill_type)
+            if (!pattern_fill_type)
             {
-                scale = 1;
+                instance["scale"] = get_json_value(sketch, "patternTileScale", 1.0);
             }
-            instance["matrix"].emplace_back(scale);
-            instance["matrix"].emplace_back(0.0);
-            instance["matrix"].emplace_back(0.0);
-            instance["matrix"].emplace_back(scale);
-            instance["matrix"].emplace_back(0.0);
-            instance["matrix"].emplace_back(0.0);            
+
+            if (2 == pattern_fill_type)
+            {
+                instance["matrix"] = nlohmann::json::array();
+                instance["matrix"].emplace_back(1.0);
+                instance["matrix"].emplace_back(0.0);
+                instance["matrix"].emplace_back(0.0);
+                instance["matrix"].emplace_back(1.0);
+                instance["matrix"].emplace_back(0.0);
+                instance["matrix"].emplace_back(0.0);                
+            }
+            else 
+            {
+                instance["rotation"] = 0;
+            }
 
             auto it_image = sketch.find("image");
             if (it_image == sketch.end())

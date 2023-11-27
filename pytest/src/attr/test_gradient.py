@@ -19,8 +19,8 @@ def test_gradient():
     check_name(obj, "line_opacity")
     gradient = obj["style"]["fills"][0]["gradient"]["instance"]
     assert gradient["class"] == "gradientLinear"
-    check_gradient_from_or_to(gradient, True, [0.19615521767606037, -0.087144455020446543])
-    check_gradient_from_or_to(gradient, False, [0.89720617706798489, 1.11999853029441])
+    check_gradient_from_or_to(gradient, True, [0.19615521767606037, 0.087144455020446543])
+    check_gradient_from_or_to(gradient, False, [0.89720617706798489, -1.11999853029441])
     stops = gradient["stops"]
     assert len(stops) == 3
     test_color.check_color(stops[0]["color"], 0.3456608531204033, 0.8883248730964468, 0.444327038570593, 1)
@@ -34,8 +34,8 @@ def test_gradient():
     check_name(obj, "radial")
     gradient = obj["style"]["fills"][0]["gradient"]["instance"]
     assert gradient["class"] == "gradientRadial"
-    check_gradient_from_or_to(gradient, True, [0.5, 0.43595083861599271])
-    check_gradient_from_or_to(gradient, False, [0.5, 1.4359508386159927])
+    check_gradient_from_or_to(gradient, True, [0.5, -0.43595083861599271])
+    check_gradient_from_or_to(gradient, False, [0.5, -1.4359508386159927])
     stops = gradient["stops"]
     assert len(stops) == 3
     test_color.check_color(stops[0]["color"], 0.06891659065572117, 0, 0.9855072463768116, 1)
@@ -45,8 +45,8 @@ def test_gradient():
     check_name(obj, "angular_0")
     gradient = obj["style"]["fills"][0]["gradient"]["instance"]
     assert gradient["class"] == "gradientAngular"    
-    check_gradient_from_or_to(gradient, True, [0.5, 0.5])
-    check_gradient_from_or_to(gradient, False, [1.0, 0.5])
+    check_gradient_from_or_to(gradient, True, [0.5, -0.5])
+    check_gradient_from_or_to(gradient, False, [1.0, -0.5])
     stops = gradient["stops"]
     assert len(stops) == 2
     test_color.check_color(stops[0]["color"], 1, 1, 1, 1)
@@ -56,6 +56,5 @@ def test_gradient():
     check_name(obj, "angular_1")
     gradient = obj["style"]["fills"][0]["gradient"]["instance"]
     assert gradient["class"] == "gradientAngular"    
-    check_gradient_from_or_to(gradient, True, [0.5, 0.5])
-    #check_gradient_from_or_to(gradient, False, [1.8584070796460177, 0.5])
-    check_gradient_from_or_to(gradient, False, [1.0, 0.5])
+    check_gradient_from_or_to(gradient, True, [0.5, -0.5])
+    check_gradient_from_or_to(gradient, False, [1.0, -0.5])

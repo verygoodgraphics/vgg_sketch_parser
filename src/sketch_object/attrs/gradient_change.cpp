@@ -53,6 +53,7 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             // 备注: 碰到过 gradient isEnable 为 false 时, 缺少 from 的情况
             // check::ins_.add_error("failed to get gradient.from");
         }
+        
         try 
         {
             point_string_change::change(sketch.at("to"), gradient["to"]);
@@ -99,7 +100,7 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 //备注: 该值理论上为 1 时, sketch 原始文件里存的是 0, 就很诡异
                 double elipse_length = get_json_value(sketch, "elipseLength", 1.0);
                 elipse_length = elipse_length == 0 ? 1 : elipse_length;
-                gradient["elipseLength"] = elipse_length;
+                gradient["ellipse"] = elipse_length;
                 break;
             }
 
@@ -107,7 +108,7 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             {
                 gradient["class"] = string("gradientAngular");
                 // gradient["rotation"] = 0.0;
-                gradient["elipseLength"] = 1;
+                gradient["ellipse"] = 1;
                 
                 // 手动修改 from 和 to
                 gradient["from"][0] = 0.5;
@@ -125,6 +126,10 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 throw sketch_exception("invalid gradient type");
             }
         }
+
+        // 翻转 from 和 to 的坐标系
+        gradient["from"][1] = gradient["from"][1].get<double>() * -1;
+        gradient["to"][1] = gradient["to"][1].get<double>() * -1;
     }
     catch(sketch_exception &e)
     {

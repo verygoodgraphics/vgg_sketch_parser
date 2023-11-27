@@ -69,3 +69,14 @@ def __collection(obj, out):
         for item in obj["shape"]["subshapes"]:
             if item["subGeometry"]["class"] != "contour":
                 __collection(item["subGeometry"], out)
+
+def check_equal(a, b):
+    if isinstance(a, (tuple, list, set, dict)):
+        assert len(a) == len(b)
+        for x, y in zip(a, b, strict = True):
+            check_equal(x, y)
+    else:
+        if isinstance(a, float) or isinstance(b, float):
+            check_float_equal(a, b)
+        else:
+            assert a == b
