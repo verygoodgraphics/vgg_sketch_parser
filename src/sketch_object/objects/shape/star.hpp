@@ -33,7 +33,6 @@ public:
     {
         assert(sketch.at("_class").get<string>() == "star");
         abstract_shape::change(sketch, vgg);
-        vgg["pathType"] = 5;
         
         /*
         sketch中未处理的属性包括:

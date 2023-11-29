@@ -106,19 +106,19 @@ def test_path():
     check_winding_rule("a25", 1)
     check_winding_rule("a26", 0)
 
-    def check_path_type(name, value):
-        obj = relation[name]
-        assert obj["pathType"] == value
-    check_path_type("a_28_Rectangle", 0)
-    check_path_type("a_29_Oval", 3)
-    check_path_type("a_30_Rectangle", 0)
-    check_path_type("a_31_Line", 6)
-    check_path_type("a_32_Line 2", 6)
-    check_path_type("a_33_Triangle", 4)
-    check_path_type("a_34_Star", 5)
-    check_path_type("a_35_Polygon", 4)
-    check_path_type("a_36_Path", 6)
-    check_path_type("a_37_Path 2", 6)
+    # def check_path_type(name, value):
+    #     obj = relation[name]
+    #     assert obj["pathType"] == value
+    # check_path_type("a_28_Rectangle", 0)
+    # check_path_type("a_29_Oval", 3)
+    # check_path_type("a_30_Rectangle", 0)
+    # check_path_type("a_31_Line", 6)
+    # check_path_type("a_32_Line 2", 6)
+    # check_path_type("a_33_Triangle", 4)
+    # check_path_type("a_34_Star", 5)
+    # check_path_type("a_35_Polygon", 4)
+    # check_path_type("a_36_Path", 6)
+    # check_path_type("a_37_Path 2", 6)
 
     # ignore object
     assert 'a_27_slice_ignore' not in relation

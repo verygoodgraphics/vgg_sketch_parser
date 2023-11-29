@@ -268,6 +268,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     } while (false);
 
     json_out.clear();
+    json_out["version"] = "1.0.8";
     json_out["fileType"] = 1;
     json_out["fileName"] = string(name);
     json_out["frames"] = nlohmann::json::array();
