@@ -432,10 +432,10 @@ nlohmann::json text::get_fixed_attr()
 {
     nlohmann::json out;
     out["fillUseType"] = 1;
-    out["kerning"] = false;
+    //out["kerning"] = false;
     out["horizontalScale"] = 1.0;
     out["verticalScale"] = 1.0;
-    out["proportionalSpacing"] = 0.0;
+    //out["proportionalSpacing"] = 0.0;
     out["rotate"] = 0.0;  
     
     return out;
