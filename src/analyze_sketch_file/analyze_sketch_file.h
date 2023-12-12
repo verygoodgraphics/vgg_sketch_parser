@@ -40,6 +40,7 @@ public:
      * @param content 待解压的文件内容
      * @param len 待解压的文件长度(byte)
      * @param name 用于标记当前的 sketch 文件, 必须是 utf-8
+     * @param version 符合 format 的版本号
      * @param json_out 输出的 json 数据
      * @param out_file 输出的文件, 比如图像 <文件名(utf-8), 文件内容>
      * 
@@ -54,6 +55,7 @@ public:
         const void* content, 
         const size_t len,
         const char* name,
+        const char* version,
         nlohmann::json &json_out,
         map<string, vector<char>> &out_file
     );

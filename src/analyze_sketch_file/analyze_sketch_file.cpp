@@ -224,8 +224,8 @@ nlohmann::json analyze_sketch_file::deal_document(const extract::t_extract_resul
     return document::change(document_json);
 }
 
-bool analyze_sketch_file::analyze(const void* content, const size_t len,
-    const char* name, nlohmann::json &json_out, map<string, vector<char>> &out_file)
+bool analyze_sketch_file::analyze(const void* content, const size_t len, const char* name, const char* version,
+    nlohmann::json &json_out, map<string, vector<char>> &out_file)
 {
     //analyze_sketch_file::init();
     
@@ -268,7 +268,7 @@ bool analyze_sketch_file::analyze(const void* content, const size_t len,
     } while (false);
 
     json_out.clear();
-    json_out["version"] = "1.0.8";
+    json_out["version"] = version;
     json_out["fileType"] = 1;
     json_out["fileName"] = string(name);
     json_out["frames"] = nlohmann::json::array();

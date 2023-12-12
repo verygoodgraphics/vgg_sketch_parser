@@ -6,14 +6,15 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        printf("need two param: first param is input sketch filepath, second param is output directory(must already exists)\n");
+        printf("need three param: first param is input sketch filepath, second param is output directory(must already exists), thrid param is version\n");
         return -1;
     }
 
     std::string input_file = argv[1];
     std::string output_dir = argv[2];
+    std::string version = argv[3];
 
     if (!std::filesystem::exists(input_file))
     {
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
     map<string, vector<char>> file_info;
     try 
     {
-        analyze_sketch_file::analyze(buf.get(), file_size, "hello-sketch", json_out, file_info);
+        analyze_sketch_file::analyze(buf.get(), file_size, "hello-sketch", version.c_str(), json_out, file_info);
     }
     catch(sketch_exception &e)
     {
