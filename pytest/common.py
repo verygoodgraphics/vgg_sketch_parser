@@ -18,7 +18,7 @@ def analyze(filename):
     :param filename 被解析的文件
     :return 解析出的 json 数据
     '''
-    result = subprocess.Popen(f'pytest/sketch_parser_tool.exe {filename} pytest/output').wait()
+    result = subprocess.Popen(f'pytest/sketch_parser_tool.exe {filename} pytest/output 1.0.9').wait()
     assert result == 0
 
     try:
@@ -80,3 +80,12 @@ def check_equal(a, b):
             check_float_equal(a, b)
         else:
             assert a == b
+
+def check_attr(obj: dict, attr: list[str | int], attr_value):
+    tmp = obj
+    for item in attr:
+        try:
+            tmp = tmp[item]
+        except:
+            tmp = None
+    check_equal(tmp, attr_value)

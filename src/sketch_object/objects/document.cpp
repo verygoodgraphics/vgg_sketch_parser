@@ -30,10 +30,12 @@ SOFTWARE.
 #include "src/sketch_object/check.hpp"
 
 unordered_map<string, int> document::text_vertical_align_;
+unordered_map<string, int> document::text_horizontal_align_;
 
 nlohmann::json document::change(const nlohmann::json &sketch)
 {
     document::text_vertical_align_.clear();
+    document::text_horizontal_align_.clear();
 
     nlohmann::json out = nlohmann::json::array();
 
@@ -83,6 +85,14 @@ nlohmann::json document::change(const nlohmann::json &sketch)
             if (it != p_obj->at("value").end())
             {
                 document::text_vertical_align_[ref_style["id"].get<string>()] = text::chagne_vertical_alignment(*it);
+
+                try 
+                {
+                    document::text_horizontal_align_[ref_style["id"].get<string>()] = text::change_text_horizontal_alignment((*it)["encodedAttributes"]);
+                }
+                catch(...)
+                {
+                }
             }
 
             out.emplace_back(std::move(ref_style));
@@ -127,6 +137,17 @@ int document::get_text_vertical_align(const string &ref_id)
 {
     auto it = document::text_vertical_align_.find(ref_id);
     if (it == document::text_vertical_align_.end())
+    {
+        return 0;
+    }
+
+    return it->second;
+}
+
+int document::get_text_horizontal_align(const string &ref_id)
+{
+    auto it = document::text_horizontal_align_.find(ref_id);
+    if (it == document::text_horizontal_align_.end())
     {
         return 0;
     }

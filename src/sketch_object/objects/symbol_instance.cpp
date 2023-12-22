@@ -388,8 +388,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                                 horizon = 0;
                             }
 
-                            obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                ids, "attr.*.horizontalAlignment", horizon));
+                            obj["overrideValues"].emplace_back(symbol_instance::create_override_value(ids, "horizontalAlignment.*", horizon));
                         }
                         else if (boost::starts_with(sv, "_textStyle"))
                         {
@@ -398,6 +397,17 @@ void symbol_instance::override_attr(nlohmann::json &obj)
 
                             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
                                 ids, "verticalAlignment", nlohmann::json(document::get_text_vertical_align(value.get<string>()))));
+
+                            try
+                            {
+                                nlohmann::json tmp = nlohmann::json::array();
+                                tmp.emplace_back(nlohmann::json(document::get_text_horizontal_align(value.get<string>())));
+                                obj["overrideValues"].emplace_back(symbol_instance::create_override_value(ids, "horizontalAlignment", std::move(tmp)));                                      
+                            }      
+                            catch(...)                    
+                            {
+                                
+                            }
                         }
                         else 
                         {

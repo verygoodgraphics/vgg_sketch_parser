@@ -39,10 +39,16 @@ public:
     // 根据 vgg-format.references.id 获取其 verticalAlignment
     static int get_text_vertical_align(const string &ref_id);
 
+    // 参考 get_text_vertical_align
+    static int get_text_horizontal_align(const string &ref_id);
+
 private:
     // <vgg-format.references.id, vgg-format.text.verticalAlignment>
     // 用于 symbol-instance 的 override
     static unordered_map<string, int> text_vertical_align_;
+
+    // 参考 text_vertical_align_
+    static unordered_map<string, int> text_horizontal_align_;
 };
 
 #endif

@@ -1,4 +1,4 @@
-﻿from common import create_collection, check_float_equal, resource_path
+﻿from common import create_collection, check_float_equal, resource_path, check_attr
 import src.attr.test_fill as test_fill
 import src.attr.test_color as test_color
 import src.attr.test_context_settings as test_context_settings
@@ -40,7 +40,7 @@ def test_text():
     check_attr_item('a5_character', 'letterSpacingValue', [50, 0])
     check_attr_item('a5_character', 'length', [4, 5])
 
-    check_attr_item('a6_line', 'lineSpaceValue', [50, 100, 200])
+    check_attr_item('a6_line', 'lineSpacingValue', [50, 100, 200])
     check_attr_item('a6_line', 'length', [11, 11, 21])
 
     def check_paragraphSpacing(name, attr_value):
@@ -55,7 +55,8 @@ def test_text():
     assert relation["a9_auto_height"]["frameMode"] == 2
     assert relation["a10_fixsize"]["frameMode"] == 0
 
-    check_attr_item('a11_align_h', 'horizontalAlignment', [0, 2, 1, 3])
+    # check_attr_item('a11_align_h', 'horizontalAlignment', [0, 2, 1, 3])
+    check_attr(relation['a11_align_h'], ['horizontalAlignment'], [0, 2, 1, 3])
     check_attr_item('a11_align_h', 'length', [11, 11, 11, 10])    
     
     assert relation["a12_align_v"]["verticalAlignment"] == 0
@@ -137,12 +138,12 @@ def test_text():
 
     # 备注: a30 ~ a32, ligature 不同值几乎没区别, 目前也未解析该字段
 
-    check_attr_item('b0_default', 'baseline', [0])
+    check_attr_item('b0_default', 'fontVariantPosition', [0])
 
-    check_attr_item('b1_sup', 'baseline', [1, 0])
+    check_attr_item('b1_sup', 'fontVariantPosition', [1, 0])
     check_attr_item('b1_sup', 'length', [4, 5])
     
-    check_attr_item('b2_sub', 'baseline', [2, 0])
+    check_attr_item('b2_sub', 'fontVariantPosition', [2, 0])
     check_attr_item('b2_sub', 'length', [4, 5])
 
     check_attr_item('b3_raise', 'baselineShift', [5, 0])
