@@ -135,7 +135,7 @@ def check_allow_override_on_and_every_item_on(file_name):
     check_override_value(obj, 1, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.size', 50)
     check_override_value(obj, 2, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.underline', 1)
     check_override_value(obj, 3, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.linethrough', False)
-    check_override_value(obj, 4, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.horizontalAlignment', 2)
+    check_override_value(obj, 4, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'horizontalAlignment.*', 2)
     check_override_value(obj, 5, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'new world')
     check_override_value(obj, 6, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'attr.*.underline', 0)
     check_override_value(obj, 7, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'attr.*.linethrough', True)
@@ -309,12 +309,12 @@ def test_symbol_mask():
 #     check_text_attr_item(attr, 'size', 72)
 #     check_text_attr_item(attr, 'kerning', False)
 #     check_text_attr_item(attr, 'letterSpacingValue', 73.5)
-#     check_text_attr_item(attr, 'lineSpaceValue', 19)
+#     check_text_attr_item(attr, 'lineSpacingValue', 19)
 #     check_text_attr_item(attr, 'underline', 0)
 #     check_text_attr_item(attr, 'linethrough', True)
 #     check_text_attr_item(attr, 'textCase', 1)
 #     check_text_attr_item(attr, 'baselineShift', -1)
-#     check_text_attr_item(attr, 'baseline', 0)
+#     check_text_attr_item(attr, 'fontVariantPosition', 0)
 #     check_float_equal(attr['textParagraph']['paragraphSpacing'], 55)
 #     check_override_value(obj, 1, ['54502DF5-31AF-43BF-873B-22C42B577FAB'], 'verticalAlignment', 1)
 
@@ -337,7 +337,7 @@ def test_symbol_mask():
 #     attr = references[3]['fontAttr']
 #     check_text_attr_item(attr, 'underline', 1)
 #     check_text_attr_item(attr, 'linethrough', False)
-#     check_text_attr_item(attr, 'baseline', 2)
+#     check_text_attr_item(attr, 'fontVariantPosition', 2)
 #     check_override_value(obj, 1, ['0008559D-E572-4DBA-8843-7109BC3AF7D8'], 'verticalAlignment', 1)
 
 # 测试数据丢失

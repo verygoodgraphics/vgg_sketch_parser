@@ -158,7 +158,84 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
                 vgg["attr"].emplace_back(std::move(vgg_font_attr));
             }
         }
-    }
+   
+        // 提取 horizontalAlignment
+        nlohmann::json h_lignment = nlohmann::json::array();
+        if (vgg["attr"].empty())
+        {
+            h_lignment.emplace_back(0);
+        }
+        else
+        {
+            auto content = vgg["content"].get<string>();
+            auto p_begin = reinterpret_cast<const unsigned char*>(content.c_str());
+            auto p_end = p_begin + content.size();
+            size_t attr_id = 0;
+            int attr_left_len = -1;
+
+            while (p_begin < p_end)
+            {
+                if (attr_left_len <= 0)
+                {
+                    try 
+                    {
+                        attr_left_len = vgg["attr"][attr_id]["length"].get<int>();
+                    }
+                    catch(...)
+                    {
+                        h_lignment.emplace_back(vgg["attr"][attr_id]["horizontalAlignment"].get<int>());
+                        break;
+                    }
+                }
+
+                if (*p_begin >> 7 == 0)
+                {
+                    if (*p_begin == '\n')
+                    {
+                        h_lignment.emplace_back(vgg["attr"][attr_id]["horizontalAlignment"].get<int>());
+                    }
+
+                    ++p_begin;
+                    --attr_left_len;
+                }
+                else if (*p_begin >> 5 == 6 && p_begin[1] >> 6 == 2)
+                {
+                    p_begin += 2;
+                    --attr_left_len;
+                }                
+                else if (*p_begin >> 4 == 0x0E && p_begin[1] >> 6 == 2 && p_begin[2] >> 6 == 2)
+                {
+                    p_begin += 3;
+                    --attr_left_len;
+                }
+                else if (*p_begin >> 3 == 0x1E && p_begin[1] >> 6 == 2 &&
+                    p_begin[2] >> 6 == 2 && p_begin[3] >> 6 == 2)
+                {
+                    p_begin += 4;
+                    attr_left_len -= 2;
+                }            
+
+                assert(attr_left_len >= 0);                   
+                if (attr_left_len <= 0)
+                {
+                    ++attr_id;
+                }
+            }            
+
+            // 处理末行不以 '\n' 结尾的情况
+            if (content.back() != '\n')
+            {
+                h_lignment.emplace_back(vgg["attr"].back()["horizontalAlignment"].get<int>());
+            }
+        }        
+
+        vgg["horizontalAlignment"] = std::move(h_lignment);
+
+        for (auto &attr : vgg["attr"])
+        {
+            attr.erase("horizontalAlignment");
+        }
+    } 
     catch(sketch_exception &e)
     {
         throw e;
@@ -173,20 +250,12 @@ nlohmann::json text::create_font_attr(const nlohmann::json &sketch)
 {
     nlohmann::json out;
 
-    /*
-    bold: 不进行设置, 会影响字体名称
-    italic: 不进行设置, 会影响字体名称
-    borderColor: 不进行设置, sketch 中没有针对单个文字进行该属性设置的接口
-    borderSize: 不进行设置, sketch 中没有针对单个文字进行该属性设置的接口
-    subFamilyName: 不进行设置
-    */
-
     out["class"] = string("fontAttr");
     out["fills"] = text::change_text_color(sketch);
     out["horizontalAlignment"] = text::change_text_horizontal_alignment(sketch);
     out.update(text::change_text_name_size(sketch));
     out["letterSpacingValue"] = text::change_text_letter_spacing(sketch);
-    out["lineSpaceValue"] = text::change_text_line_spacing(sketch, out["size"].get<double>());
+    out["lineSpacingValue"] = text::change_text_line_spacing(sketch, out["size"].get<double>());
     out["textParagraph"] = text::change_text_paragraph(sketch);
     out.update(text::get_fixed_attr());
 
@@ -195,7 +264,7 @@ nlohmann::json text::create_font_attr(const nlohmann::json &sketch)
     out["linethrough"] = text::change_text_line_through(sketch);
     out["textCase"] = text::change_text_letter_transform(sketch);
     out["baselineShift"] = text::change_text_baseline_shift(sketch);
-    out["baseline"] = text::change_text_baseline(sketch);   
+    out["fontVariantPosition"] = text::change_text_baseline(sketch);   
 
     return out;
 }

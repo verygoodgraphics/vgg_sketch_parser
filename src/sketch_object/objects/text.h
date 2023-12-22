@@ -37,13 +37,13 @@ public:
 
     // 提取 verticalAlignment
     static int chagne_vertical_alignment(const nlohmann::json &sketch);
-    
+
+    // 提取 alignment 信息, 返回 horizontalAlignment
+    static int change_text_horizontal_alignment(const nlohmann::json &sketch);
+
 private:
     // 提取 color 信息, 返回 font-attr.fills
     static nlohmann::json change_text_color(const nlohmann::json &sketch);
-
-    // 提取 alignment 信息, 返回 font-attr.horizontalAlignment
-    static int change_text_horizontal_alignment(const nlohmann::json &sketch);
 
     // 提取 font-attr.name 和 font-attr.size
     static nlohmann::json change_text_name_size(const nlohmann::json &sketch);
