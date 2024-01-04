@@ -118,7 +118,7 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
         }
         
         //确保有序
-        vgg["attr"] = nlohmann::json::array();
+        vgg["fontAttr"] = nlohmann::json::array();
         vector<const nlohmann::json*> order_attributes;
         it = sketch.find("attributes");
         if (it != sketch.end())
@@ -155,13 +155,13 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
                     check::ins_.add_error("failed to get text.attr.length");
                 }
 
-                vgg["attr"].emplace_back(std::move(vgg_font_attr));
+                vgg["fontAttr"].emplace_back(std::move(vgg_font_attr));
             }
         }
    
         // 提取 horizontalAlignment
         nlohmann::json h_lignment = nlohmann::json::array();
-        if (vgg["attr"].empty())
+        if (vgg["fontAttr"].empty())
         {
             h_lignment.emplace_back(0);
         }
@@ -179,11 +179,11 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
                 {
                     try 
                     {
-                        attr_left_len = vgg["attr"][attr_id]["length"].get<int>();
+                        attr_left_len = vgg["fontAttr"][attr_id]["length"].get<int>();
                     }
                     catch(...)
                     {
-                        h_lignment.emplace_back(vgg["attr"][attr_id]["horizontalAlignment"].get<int>());
+                        h_lignment.emplace_back(vgg["fontAttr"][attr_id]["horizontalAlignment"].get<int>());
                         break;
                     }
                 }
@@ -192,7 +192,7 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
                 {
                     if (*p_begin == '\n')
                     {
-                        h_lignment.emplace_back(vgg["attr"][attr_id]["horizontalAlignment"].get<int>());
+                        h_lignment.emplace_back(vgg["fontAttr"][attr_id]["horizontalAlignment"].get<int>());
                     }
 
                     ++p_begin;
@@ -225,13 +225,13 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
             // 处理末行不以 '\n' 结尾的情况
             if (content.back() != '\n')
             {
-                h_lignment.emplace_back(vgg["attr"].back()["horizontalAlignment"].get<int>());
+                h_lignment.emplace_back(vgg["fontAttr"].back()["horizontalAlignment"].get<int>());
             }
         }        
 
         vgg["horizontalAlignment"] = std::move(h_lignment);
 
-        for (auto &attr : vgg["attr"])
+        for (auto &attr : vgg["fontAttr"])
         {
             attr.erase("horizontalAlignment");
         }

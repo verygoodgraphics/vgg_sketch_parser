@@ -8,8 +8,8 @@ def test_text():
 
     def check_attr_item(name, attr_name, attr_value):
         obj = relation[name]
-        assert len(obj['attr']) == len(attr_value)
-        for x, y in zip(obj['attr'], attr_value):
+        assert len(obj['fontAttr']) == len(attr_value)
+        for x, y in zip(obj['fontAttr'], attr_value):
             if isinstance(y, float):
                 check_float_equal(x[attr_name], y)
             else:
@@ -27,8 +27,8 @@ def test_text():
     check_attr_item('a3_font_subname', 'name', ['PingFangSC-Regular', 'PingFangSC-Semibold'])
     check_attr_item('a3_font_subname', 'length', [4, 5])
 
-    fill_0 = relation['a4_font_color']['attr'][0]['fills'][0]
-    fill_1 = relation['a4_font_color']['attr'][1]['fills'][0]
+    fill_0 = relation['a4_font_color']['fontAttr'][0]['fills'][0]
+    fill_1 = relation['a4_font_color']['fontAttr'][1]['fills'][0]
     test_fill.check_isEnabled(fill_0, True)
     test_fill.check_isEnabled(fill_1, True)
     test_fill.check_fillType(fill_0, 0)
@@ -45,8 +45,8 @@ def test_text():
 
     def check_paragraphSpacing(name, attr_value):
         obj = relation[name]
-        assert len(obj['attr']) == len(attr_value)
-        for x, y in zip(obj['attr'], attr_value):
+        assert len(obj['fontAttr']) == len(attr_value)
+        for x, y in zip(obj['fontAttr'], attr_value):
             check_float_equal(x["textParagraph"]["paragraphSpacing"], y)
     check_paragraphSpacing('a7_paragraph', [0, 50, 100, 0])
     check_attr_item('a7_paragraph', 'length', [11, 11, 11, 10])
@@ -77,11 +77,11 @@ def test_text():
     check_obj_style_fill_type('a_20_fill_pattern', 2)
 
     check_obj_style_fill_type('szn_tmp_test_0', 1)
-    test_context_settings.check_context_settings(relation['szn_tmp_test_0']["attr"][0]["fills"][0]["contextSettings"], 0, 1)
+    test_context_settings.check_context_settings(relation['szn_tmp_test_0']["fontAttr"][0]["fills"][0]["contextSettings"], 0, 1)
     
     obj = relation['szn_tmp_test_1']
     check_attr_item('szn_tmp_test_1', 'length', [4, 5])
-    assert len(obj['attr'][0]["fills"]) == 1
+    assert len(obj['fontAttr'][0]["fills"]) == 1
     assert len(obj['style']['fills']) == 2
 
     fill_0 = obj['style']['fills'][0]
@@ -90,10 +90,10 @@ def test_text():
     test_fill.check_isEnabled(fill_1, False)
     test_color.check_color(fill_0['color'], 0.4312062628075353, 0.05259809119830333, 0.8985507246376812, 0.5)
     test_color.check_color(fill_1['color'], 0.9130434782608695, 0.02226935312831391, 0.02226935312831391, 0.01)
-    assert len(obj['attr'][0]["fills"]) == 1
-    assert len(obj['attr'][1]["fills"]) == 1
-    fill_0 = obj['attr'][0]['fills'][0]
-    fill_1 = obj['attr'][1]['fills'][0]
+    assert len(obj['fontAttr'][0]["fills"]) == 1
+    assert len(obj['fontAttr'][1]["fills"]) == 1
+    fill_0 = obj['fontAttr'][0]['fills'][0]
+    fill_1 = obj['fontAttr'][1]['fills'][0]
     test_fill.check_isEnabled(fill_0, True)
     test_fill.check_isEnabled(fill_1, True)
     test_color.check_color(fill_0['color'], 0.9565217391304348, 0, 0, 0.5)
@@ -108,10 +108,10 @@ def test_text():
     test_fill.check_isEnabled(fill_1, True)
     test_color.check_color(fill_0['color'], 0.4312062628075353, 0.05259809119830333, 0.8985507246376812, 0.5)
     test_color.check_color(fill_1['color'], 1, 0.02926829268292686, 0.02926829268292686, 0.1)
-    assert len(obj['attr'][0]["fills"]) == 1
-    assert len(obj['attr'][1]["fills"]) == 1
-    fill_0 = obj['attr'][0]['fills'][0]
-    fill_1 = obj['attr'][1]['fills'][0]
+    assert len(obj['fontAttr'][0]["fills"]) == 1
+    assert len(obj['fontAttr'][1]["fills"]) == 1
+    fill_0 = obj['fontAttr'][0]['fills'][0]
+    fill_1 = obj['fontAttr'][1]['fills'][0]
     test_fill.check_isEnabled(fill_0, True)
     test_fill.check_isEnabled(fill_1, True)
     test_color.check_color(fill_0['color'], 0.9565217391304348, 0, 0, 0.5)
