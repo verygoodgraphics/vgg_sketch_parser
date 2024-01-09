@@ -90,7 +90,7 @@ void abstract_layer::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 vgg["bounds"].at("height").get<double>());
             rect_change::form_matrix(matrix, vgg["matrix"]);
 
-            rect_change::calc_frame(matrix, vgg["bounds"], vgg["frame"]);
+            rect_change::calc_frame(matrix, vgg["bounds"], vgg["transformedBounds"]);
 
             // 备注: bounds的起点固定为(0, 0)
             vgg["bounds"].at("x") = 0.0;

@@ -18,7 +18,7 @@ def analyze(filename):
     :param filename 被解析的文件
     :return 解析出的 json 数据
     '''
-    result = subprocess.Popen(f'pytest/sketch_parser_tool.exe {filename} pytest/output 1.0.9').wait()
+    result = subprocess.Popen(f'pytest/sketch_parser_tool.exe {filename} pytest/output 1.0.11').wait()
     assert result == 0
 
     try:

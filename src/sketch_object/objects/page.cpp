@@ -85,7 +85,7 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
                 // assert(default_artboard->at("layers").size() == 1);
                 // auto &layer = default_artboard->at("layers").front();
 
-                auto &frame = out.at("frame");
+                auto &frame = out.at("transformedBounds");
                 rect child_rect(frame.at("x").get<double>(), frame.at("y").get<double>(), 
                     frame.at("width").get<double>(), frame.at("height").get<double>());
                 if (default_artboard_rect)
@@ -123,8 +123,8 @@ void page::change(const nlohmann::json &sketch, nlohmann::json &vgg)
         //     item.at("matrix").at(5)  = item.at("matrix").at(5).get<double>() - y;
         // }
 
-        rect_change::from_rect(*default_artboard_rect, (*default_artboard)["frame"]);
-        (*default_artboard)["bounds"] = default_artboard->at("frame");
+        rect_change::from_rect(*default_artboard_rect, (*default_artboard)["transformedBounds"]);
+        (*default_artboard)["bounds"] = default_artboard->at("transformedBounds");
 
         vgg["frames"].emplace_back(std::move(*default_artboard));
     }

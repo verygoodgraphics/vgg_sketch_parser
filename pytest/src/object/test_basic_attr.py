@@ -70,7 +70,7 @@ def test_basic_attr():
             frame_h = bound_h
 
         check_rect(obj["bounds"], bound_x, bound_y, bound_w, bound_h)
-        check_rect(obj["frame"], frame_x, frame_y, frame_w, frame_h)
+        check_rect(obj["transformedBounds"], frame_x, frame_y, frame_w, frame_h)
         check_matrix(obj, matrix)
 
         a = matrix[0]
