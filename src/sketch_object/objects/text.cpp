@@ -72,6 +72,10 @@ void text::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             }
         }
         vgg["frameMode"] = text_behavious;
+        if (text_behavious)
+        {
+            vgg["overflow"] = 2;
+        }
 
         try 
         {
