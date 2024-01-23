@@ -125,6 +125,12 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
         if (sketch.find("contextSettings") != sketch.end())
         {
             context_settings_change::change(sketch.at("contextSettings"), context_setting);
+
+            // 即 figma 的效果
+            if (!context_setting["blendMode"].get<int>())
+            {
+                context_setting["blendMode"] = 27;
+            }
         }
         else 
         {
