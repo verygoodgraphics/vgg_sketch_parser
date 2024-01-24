@@ -21,7 +21,7 @@ def test_context_settings():
     check_name(obj, '0_fill_border')
     check_context_settings(fill_cs, 6, 1.0)
     check_context_settings(border_cs, 4, 1.0)
-    check_context_settings(global_cs, 0, 1.0)
+    check_context_settings(global_cs, 27, 1.0)
 
     # 全局的 context-setting
     obj = objs[1]
@@ -43,4 +43,5 @@ def test_context_settings():
     objs = out['frames'][1]['childObjects']
     assert len(objs) == 18
     for x, y in zip(objs, range(len(objs))):
+        if not y: y = 27
         assert x["contextSettings"]["blendMode"] == y

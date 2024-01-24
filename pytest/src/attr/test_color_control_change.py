@@ -2,7 +2,7 @@
 
 def check_color_control_change(attr, isEnabled, brightness, contrast, hue, saturation):
     assert attr["isEnabled"] == isEnabled
-    check_float_equal(attr["brightness"], brightness)
+    check_float_equal(attr["exposure"], brightness)
     check_float_equal(attr["contrast"], contrast)
     check_float_equal(attr["hue"], hue)
     check_float_equal(attr["saturation"], saturation)
@@ -11,11 +11,11 @@ def test_color_control_change():
     out = analyze(f'{resource_path}/attr/color_control_change.sketch')
     objs = out['frames'][0]['childObjects']    
 
-    check_color_control_change(objs[0]["imageAdjust"]["instance"],
+    check_color_control_change(objs[0]["imageFilters"],
                                True, 
-                               -0.379746835443038, 
-                               2.89873417721519, 
-                               1.193009868451821, 
-                               1.379746835443038)
-    check_color_control_change(objs[1]["imageAdjust"]["instance"],
-                               True, 0, 1, 0, 1)
+                               -0.379746835443038 / 100, 
+                               2.89873417721519 / 100, 
+                               1.193009868451821 / 100, 
+                               1.379746835443038 / 100)
+    check_color_control_change(objs[1]["imageFilters"],
+                               True, 0, 1 / 100, 0, 1 / 100)

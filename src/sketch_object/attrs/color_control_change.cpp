@@ -38,10 +38,10 @@ void color_control_change::change(const nlohmann::json &sketch, nlohmann::json &
     };
 
     assert(sketch.at("_class").get<string>() == "colorControls");
-    vgg["class"] = string("colorControls");
+    vgg["class"] = string("imageFilters");
     vgg["isEnabled"] = get_json_value(sketch, "isEnabled", false);
-    vgg["brightness"] = get(sketch, "brightness", 0.0);
-    vgg["contrast"] = get(sketch, "contrast", 0.0);
-    vgg["hue"] = get(sketch, "hue", 0.0);
-    vgg["saturation"] = get(sketch, "saturation", 0.0);
+    vgg["exposure"] = get(sketch, "brightness", 0.0) / 100.0;
+    vgg["contrast"] = get(sketch, "contrast", 0.0) / 100.0;
+    vgg["hue"] = get(sketch, "hue", 0.0) / 100.0;
+    vgg["saturation"] = get(sketch, "saturation", 0.0) / 100.0;
 }

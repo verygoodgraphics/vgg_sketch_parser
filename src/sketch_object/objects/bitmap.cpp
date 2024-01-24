@@ -67,11 +67,7 @@ void bitmap::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     //colorControls 在 sketch-schema 1.0 中是可选的
     try
     {
-        nlohmann::json image_adjust;
-        image_adjust["class"] = std::string("imageAdjust");
-        color_control_change::change(sketch.at("style").at("colorControls"), image_adjust["instance"]);
-
-        vgg["imageAdjust"] = std::move(image_adjust);
+        color_control_change::change(sketch.at("style").at("colorControls"), vgg["imageFilters"]);
     }
     catch(...)
     {
