@@ -80,6 +80,10 @@ nlohmann::json document::change(const nlohmann::json &sketch)
             {
                 ref_style.erase("fontAttr");
             }
+            else
+            {
+                ref_style["fontAttr"].erase("horizontalAlignment");
+            }
 
             auto it = p_obj->at("value").find("textStyle");
             if (it != p_obj->at("value").end())

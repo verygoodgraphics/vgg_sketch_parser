@@ -33,6 +33,7 @@ public:
 
 public:
     // 构建 font-attr
+    // 备注: 返回值包含的 horizontalAlignment 需要在外部手动处理后删除
     static nlohmann::json create_font_attr(const nlohmann::json &sketch);
 
     // 提取 verticalAlignment
