@@ -26,22 +26,24 @@ SOFTWARE.
 #include "src/sketch_object/check.hpp"
 #include "src/basic/get_json_value.hpp"
 
+const double pi = 3.141592653589793;
+
 void color_control_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     vgg.clear();
 
-    auto get = [](const nlohmann::json &sketch, const char* key, double default_value)
+    auto get = [](const nlohmann::json &sketch, const char* key, double default_value, double min_value, double max_value)
     {
         double value = get_json_value(sketch, key, default_value);
-        check::ins_.check_range(value, -100.0, 100.0, 0.0, "invalid color control");
+        check::ins_.check_range(value, min_value, max_value, 0.0, "invalid color control");
         return value;
     };
 
     assert(sketch.at("_class").get<string>() == "colorControls");
     vgg["class"] = string("imageFilters");
     vgg["isEnabled"] = get_json_value(sketch, "isEnabled", false);
-    vgg["exposure"] = get(sketch, "brightness", 0.0) / 100.0;
-    vgg["contrast"] = get(sketch, "contrast", 0.0) / 100.0;
-    vgg["hue"] = get(sketch, "hue", 0.0) / 100.0;
-    vgg["saturation"] = get(sketch, "saturation", 0.0) / 100.0;
+    vgg["exposure"] = get(sketch, "brightness", 0, -1, 1);
+    vgg["contrast"] = (get(sketch, "contrast", 0, 0, 4) - 2) / 2.0;
+    vgg["hue"] = get(sketch, "hue", 0, -pi, pi) / pi;
+    vgg["saturation"] = get(sketch, "saturation", 0, 0, 2) - 1;
 }
