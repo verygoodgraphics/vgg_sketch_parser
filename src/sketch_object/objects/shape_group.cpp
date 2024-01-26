@@ -32,6 +32,32 @@ shape_group::shape_group()
     init_child(child_);
 }
 
+void update_mark_type(nlohmann::json &obj, int start_mark_type, int end_mark_type)
+{
+    if (obj["class"] != "path")
+    {
+        return;
+    }
+
+    for (auto &child : obj["shape"]["subshapes"])
+    {
+        auto type = child["subGeometry"]["class"].get<std::string>();
+        if (type == "path")
+        {
+            update_mark_type(child["subGeometry"], start_mark_type, end_mark_type);
+        }
+        else if (type == "contour") 
+        {
+            auto &points = child["subGeometry"]["points"];
+            if (!points.empty())
+            {
+                points.front()["markType"] = start_mark_type;
+                points.back()["markType"] = end_mark_type;
+            }
+        }
+    }
+}
+
 void shape_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)
 {
     abstract_layer::change(sketch, vgg);
@@ -74,6 +100,10 @@ void shape_group::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             }
         }
 
+        update_mark_type(vgg, 
+            get_json_value(sketch.at("style"), "startMarkerType", 0),
+            get_json_value(sketch.at("style"), "endMarkerType", 0));
+            
         /*
         sketch中未处理的属性包括:
         hasClickThrough

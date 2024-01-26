@@ -49,6 +49,18 @@ void abstract_shape::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             check::ins_.add_error("failed to change points");
         }
         
+        try 
+        {
+            if (!contour.empty())
+            {
+                contour["points"].front()["markType"] = get_json_value(sketch.at("style"), "startMarkerType", 0);
+                contour["points"].back()["markType"] = get_json_value(sketch.at("style"), "endMarkerType", 0);
+            }            
+        }
+        catch(...)
+        {
+        }
+
         nlohmann::json sub_shape;
         sub_shape["class"] = string("subshape");
         sub_shape["subGeometry"] = std::move(contour);

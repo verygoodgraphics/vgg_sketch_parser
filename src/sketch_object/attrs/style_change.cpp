@@ -146,16 +146,6 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
         throw sketch_exception("fail to change style");
     }
 
-    // 脏代码 
-    // 备注: sketch 实际取值和其 schema 不同
-    int start_marker_type = get_json_value(sketch, "startMarkerType", -1);
-    int end_marker_type = get_json_value(sketch, "endMarkerType", -1);
-    for (auto &item : vgg["borders"])
-    {
-        item["startMarkerType"] = start_marker_type;
-        item["endMarkerType"] = end_marker_type;
-    }
-
     do
     {
         if (!text_style)
@@ -180,7 +170,8 @@ void style_change::change(const nlohmann::json &sketch, nlohmann::json &vgg, nlo
     do_objectID
     */
 
-    //windingRule: 在 abstract_shapp.cpp 中被处理了
+    // windingRule: 在 abstract_shapp.cpp 中被处理了
+    // startMarkerType endMarkerType 在 abstract_shape.cpp 中处理
 }
 
 void style_change::get_default(nlohmann::json &out)
