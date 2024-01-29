@@ -35,7 +35,12 @@ void color_control_change::change(const nlohmann::json &sketch, nlohmann::json &
     auto get = [](const nlohmann::json &sketch, const char* key, double default_value, double min_value, double max_value)
     {
         double value = get_json_value(sketch, key, default_value);
-        check::ins_.check_range(value, min_value, max_value, 0.0, "invalid color control");
+        value = (std::min)(max_value, value);
+        value = (std::max)(min_value, value);
+
+        // Fitness App.sketch 里就有非法的范围
+        //check::ins_.check_range(value, min_value, max_value, 0.0, "invalid color control");
+        
         return value;
     };
 
