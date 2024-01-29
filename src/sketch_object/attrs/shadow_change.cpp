@@ -49,7 +49,7 @@ void shadow_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     }
     
     vgg["offsetX"] = get_json_value(sketch, "offsetX", 0.0); 
-    vgg["offsetY"] = get_json_value(sketch, "offsetY", 0.0); 
+    vgg["offsetY"] = -get_json_value(sketch, "offsetY", 0.0); 
     vgg["blur"] = get_json_value(sketch, "blurRadius", 0.0);
     vgg["spread"] = get_json_value(sketch, "spread", 0.0);
 

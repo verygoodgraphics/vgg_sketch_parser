@@ -29,15 +29,15 @@ def test_shadow():
     # one shadow
     obj = objs[1]
     check_name(obj, 'one')
-    check_shadow_basic(obj["style"]["shadows"][0], True, 10.1, 20.1, 10, -1.5, False)
+    check_shadow_basic(obj["style"]["shadows"][0], True, 10.1, -20.1, 10, -1.5, False)
     test_color.check_color(obj["style"]["shadows"][0]["color"], 0, 0, 0, 0.5)
     
     # two shadow
     obj = objs[2]
     check_name(obj, 'two')
-    check_shadow_basic(obj["style"]["shadows"][0], True, 10, -20, 10.2, 11.5, False)
+    check_shadow_basic(obj["style"]["shadows"][0], True, 10, 20, 10.2, 11.5, False)
     test_color.check_color(obj["style"]["shadows"][0]["color"], 0.2500327526838662, 0.1009544008483563, 0.8623188405797102, 0.5)
-    check_shadow_basic(obj["style"]["shadows"][1], True, 5, 20, 40, 30.1, False)
+    check_shadow_basic(obj["style"]["shadows"][1], True, 5, -20, 40, 30.1, False)
     test_color.check_color(obj["style"]["shadows"][1]["color"], 0.5447184134352745, 0.8623188405797102, 0.1177801343230824, 0.5)
     
     # three shadow with disable
