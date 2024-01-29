@@ -48,7 +48,10 @@ void color_control_change::change(const nlohmann::json &sketch, nlohmann::json &
     vgg["class"] = string("imageFilters");
     vgg["isEnabled"] = get_json_value(sketch, "isEnabled", false);
     vgg["exposure"] = get(sketch, "brightness", 0, -1, 1);
-    vgg["contrast"] = (get(sketch, "contrast", 0, 0, 4) - 2) / 2.0;
     vgg["hue"] = get(sketch, "hue", 0, -pi, pi) / pi;
     vgg["saturation"] = get(sketch, "saturation", 0, 0, 2) - 1;
+
+    // contrast: [0, 4], 界面设为 0%, 则保存的数据为 1
+    //vgg["contrast"] = (get(sketch, "contrast", 0, 0, 4) - 2) / 2.0;
+    vgg["contrast"] = (get(sketch, "contrast", 0, 0, 4) - 1) / 3.0;
 }
