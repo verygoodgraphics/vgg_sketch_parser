@@ -46,6 +46,7 @@ void blur_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
     try
     {
         point_string_change::change(sketch.at("center"), vgg["center"]);
+        vgg["center"][1] = vgg["center"][1].get<double>() * -1;
     }
     catch (...)
     {
