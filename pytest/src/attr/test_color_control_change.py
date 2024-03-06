@@ -14,8 +14,8 @@ def test_color_control_change():
     check_color_control_change(objs[0]["imageFilters"],
                                True, 
                                -0.379746835443038, 
-                               (2.89873417721519 - 2) / 2, 
+                               (2.89873417721519 - 1) / 3, 
                                (1.193009868451821) / 3.141592653589793,
                                1.379746835443038 - 1)
     check_color_control_change(objs[1]["imageFilters"],
-                               True, 0, (1 - 2) / 2, 0, 1 - 1)
+                               True, 0, (1 - 1) / 3, 0, 1 - 1)

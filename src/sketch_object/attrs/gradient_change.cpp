@@ -82,7 +82,7 @@ void gradient_change::change(const nlohmann::json &sketch, nlohmann::json &vgg)
             check::ins_.add_error("failed to get gradient.stops");
         }
         
-        gradient["invert"] = false;
+        // gradient["invert"] = false;
 
         int type = get_json_value(sketch, "gradientType", 0);
         switch (type)

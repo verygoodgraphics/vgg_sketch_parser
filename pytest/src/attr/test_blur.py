@@ -30,16 +30,16 @@ def test_blur():
         check_blur(objs[id]['style']['blurs'][0], type, isEnabled, center, saturation, radius, motionAngle)
 
     # Gaussian
-    check(0, 'a0', 0, True, [0.5, 0.5], 1.0, 10.0, 0.0)
+    check(0, 'a0', 0, True, [0.5, -0.5], 1.0, 10.0, 0.0)
 
     # Motion
-    check(1, 'a1', 1, True, [0.5, 0.5], 1.0, 10.0, 71.11111111111111)
+    check(1, 'a1', 1, True, [0.5, -0.5], 1.0, 10.0, 71.11111111111111)
 
     # Zoom
-    check(2, "a2", 2, True, [0.94326241134751809, 0.91200000000000014], 1, 10, 0)
+    check(2, "a2", 2, True, [0.94326241134751809, -0.91200000000000014], 1, 10, 0)
 
     # Background
-    check(3, "a3", 3, True, [0.5, 0.5], 1.530864197530864, 33, 0)
+    check(3, "a3", 3, True, [0.5, -0.5], 1.530864197530864, 33, 0)
 
     # isEnabled is false
-    check(4, "a4", 0, False, [0.5, 0.5], 1, 10, 0)
+    check(4, "a4", 0, False, [0.5, -0.5], 1, 10, 0)
