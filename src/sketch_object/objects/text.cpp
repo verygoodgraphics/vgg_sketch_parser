@@ -142,7 +142,7 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
             }
             catch(...)
             {
-                check::ins_.add_error("failed to sort text.attr");
+                check::ins_.add_error("failed to sort text.fontAttr");
             }
 
             for (auto &item : order_attributes)
@@ -156,7 +156,7 @@ void text::attributed_string_change(const nlohmann::json &sketch, nlohmann::json
                 }
                 catch(...)
                 {
-                    check::ins_.add_error("failed to get text.attr.length");
+                    check::ins_.add_error("failed to get text.fontAttr.length");
                 }
 
                 vgg["fontAttr"].emplace_back(std::move(vgg_font_attr));

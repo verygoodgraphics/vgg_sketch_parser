@@ -343,7 +343,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                         else if (boost::starts_with(sv, "_textSize"))
                         {
                             obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                ids, "attr.*.size", strtof(value.get<string>().c_str(), nullptr)));
+                                ids, "fontAttr.*.size", strtof(value.get<string>().c_str(), nullptr)));
                         }
                         else if (boost::starts_with(sv, "_textDecoration"))
                         {
@@ -351,18 +351,18 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                             if (str == "underline")
                             {
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids, "attr.*.underline", 1));
+                                    ids, "fontAttr.*.underline", 1));
 
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids, "attr.*.linethrough", false));                                
+                                    ids, "fontAttr.*.linethrough", false));                                
                             }
                             else if (str == "strikethrough")
                             {
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids, "attr.*.underline", 0));
+                                    ids, "fontAttr.*.underline", 0));
 
                                 obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                                    ids, "attr.*.linethrough", true));    
+                                    ids, "fontAttr.*.linethrough", true));    
                             }                                         
                         }                    
                         else if (boost::starts_with(sv, "_textHAlign"))
@@ -421,7 +421,7 @@ void symbol_instance::override_attr(nlohmann::json &obj)
                         color_change::change(value, color);
 
                         obj["overrideValues"].emplace_back(symbol_instance::create_override_value(
-                            ids, "attr.*.fills.*.color", std::move(color)));
+                            ids, "fontAttr.*.fills.*.color", std::move(color)));
                     }
                     else if (boost::starts_with(sv, "_textWeight"))
                     {

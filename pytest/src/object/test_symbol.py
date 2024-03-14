@@ -131,16 +131,16 @@ def check_allow_override_on_and_every_item_on(file_name):
     obj = out['page1_master_text']['overrideValues']
     assert len(obj) == 10
     check_color_override(obj, 0, 0.9782608695652174, 0.01908801696712621, 0.01908801696712621, 0.5,
-                         '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.fills.*.color')      
-    check_override_value(obj, 1, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.size', 50)
-    check_override_value(obj, 2, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.underline', 1)
-    check_override_value(obj, 3, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'attr.*.linethrough', False)
+                         '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'fontAttr.*.fills.*.color')      
+    check_override_value(obj, 1, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'fontAttr.*.size', 50)
+    check_override_value(obj, 2, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'fontAttr.*.underline', 1)
+    check_override_value(obj, 3, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'fontAttr.*.linethrough', False)
     check_override_value(obj, 4, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'horizontalAlignment.*', 2)
     check_override_value(obj, 5, '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83', 'content', 'new world')
-    check_override_value(obj, 6, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'attr.*.underline', 0)
-    check_override_value(obj, 7, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'attr.*.linethrough', True)
-    check_override_value(obj, 8, '985FEC76-D8E5-4EBF-B119-F26E367F7BC6', 'attr.*.underline', 1)
-    check_override_value(obj, 9, '985FEC76-D8E5-4EBF-B119-F26E367F7BC6', 'attr.*.linethrough', False)
+    check_override_value(obj, 6, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'fontAttr.*.underline', 0)
+    check_override_value(obj, 7, 'F052DA2D-69E8-4F54-AB92-F19335E9486F', 'fontAttr.*.linethrough', True)
+    check_override_value(obj, 8, '985FEC76-D8E5-4EBF-B119-F26E367F7BC6', 'fontAttr.*.underline', 1)
+    check_override_value(obj, 9, '985FEC76-D8E5-4EBF-B119-F26E367F7BC6', 'fontAttr.*.linethrough', False)
 
     obj = out['Master_Nest_Path_change_3_attr']['overrideValues']
     assert len(obj) == 3
@@ -178,20 +178,20 @@ def check_allow_override_on_and_every_item_on(file_name):
 
     obj = out['Master_Nest_change_fill_color_and_text_size_color']['overrideValues']
     assert len(obj) == 4
-    check_override_value(obj, 0, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'attr.*.size', 30)
+    check_override_value(obj, 0, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'fontAttr.*.size', 30)
     check_color_override(obj, 1, 1, 0, 0, 1, ['651675C7-452D-48D3-A84A-A6CF6796E3B3', 'FB099C6B-9E82-43D9-84EE-909F6D602498'], 'style.fills.3.color')
-    check_color_override(obj, 2, 1, 0, 0, 0.8, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'attr.*.fills.*.color')
+    check_color_override(obj, 2, 1, 0, 0, 0.8, ['0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'fontAttr.*.fills.*.color')
     check_color_override(obj, 3, 0, 1, 0, 1, '31757F0E-A99C-447D-BE5C-BF84EC724F0B', 'style.fills.0.color')
 
     obj = out['page1_Master_Nest_Double_change_color']['overrideValues']
     check_color_override(obj, 0, 0, 1, 1, 1, '77077B65-EB8F-4D66-A533-44224D8720C7', 'style.fills.0.color')
-    check_color_override(obj, 1, 1, 0, 1, 0.5, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', 'F052DA2D-69E8-4F54-AB92-F19335E9486F'], 'attr.*.fills.*.color')
-    check_color_override(obj, 2, 1, 0, 0, 1, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '985FEC76-D8E5-4EBF-B119-F26E367F7BC6'], 'attr.*.fills.*.color')
+    check_color_override(obj, 1, 1, 0, 1, 0.5, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', 'F052DA2D-69E8-4F54-AB92-F19335E9486F'], 'fontAttr.*.fills.*.color')
+    check_color_override(obj, 2, 1, 0, 0, 1, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3', '985FEC76-D8E5-4EBF-B119-F26E367F7BC6'], 'fontAttr.*.fills.*.color')
 
     obj = out['Master_Nest_Double_change_symbol_and_color']['overrideValues']
     check_override_value(obj, 0, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '651675C7-452D-48D3-A84A-A6CF6796E3B3'], 'masterId', 'E6687A9D-5F3C-49F7-90BB-F19DBC9A956C')
     check_color_override(obj, 1, 0, 0, 0, 1, '77077B65-EB8F-4D66-A533-44224D8720C7', 'style.fills.0.color')
-    check_color_override(obj, 2, 1, 0, 1, 1, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '651675C7-452D-48D3-A84A-A6CF6796E3B3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'attr.*.fills.*.color')
+    check_color_override(obj, 2, 1, 0, 1, 1, ['D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '651675C7-452D-48D3-A84A-A6CF6796E3B3', '95C02DB7-5EC9-4A61-97B1-0FFBE0C30E83'], 'fontAttr.*.fills.*.color')
 
     obj = out['page1_Master_Nest_Triple_change_symbol_and_color_and_text']['overrideValues']
     check_override_value(obj, 0, ['74FC2703-A058-442A-941B-54990FADFAB5', 'D4568B7D-9CCF-4284-98AB-4E7D2A4C8DED', '0B8DCD1B-9BEA-4DC3-88B9-D6A0BC5DD9C3'], 'masterId', '59B5C63E-4B01-4D1F-8D5B-459FE06E638C')
